@@ -41,14 +41,12 @@ public class RpcServer {
             logger.info("{}", serverSocket);
             // 每收到一个请求，就创建一个工作线程
             while ((socket = serverSocket.accept()) != null) {
-                logger.info("客户端连接! IP: " + socket.getInetAddress());
-                threadPool.execute(new WorkerThread(socket, service));
+                logger.info("客户端连接! IP: " + socket.getInetAddress() + ":" + socket.getPort());
+                threadPool.execute(new RequestHandler(socket, service));
             }
         } catch (IOException e) {
             logger.error("连接时发生错误: ", e);
         }
     }
-
-
 
 }

@@ -1,6 +1,8 @@
 package top.mffseal.rpc.client;
 
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequest;
 import top.mffseal.rpc.entity.RpcResponse;
 
@@ -9,13 +11,15 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * 一个拦截器
+ * 一个拦截器，该类不会解析从服务端收到的数据，
+ * 直接交给RpcClient处理。
  * @author mffseal
  */
 
 public class RpcClientProxy implements InvocationHandler {
     private String host;
     private int port;
+    private static final Logger logger = LoggerFactory.getLogger(RpcClientProxy.class);
 
     public RpcClientProxy(String host, int port) {
         this.host = host;
@@ -23,7 +27,7 @@ public class RpcClientProxy implements InvocationHandler {
     }
 
     /**
-     * 获取一个代理对象，代理掉目标类，应用当前拦截器
+     * 获取一个代理对象，代理掉目标类，应用当前拦截器。
      * @param clazz 目标类
      * @return 代理对象
      * @param <T> 目标类的类型
@@ -37,26 +41,18 @@ public class RpcClientProxy implements InvocationHandler {
      * 拦截器拦截掉所有方法，并为每个方法生成一个RpcRequest对象，
      * 并实例化一个RpcClient发送该RpcRequest，等待RpcResponse返回。
      *
-     * @param proxy the proxy instance that the method was invoked on
+     * @param proxy 要在哪个代理对象上调用该方法。
      *
-     * @param method the {@code Method} instance corresponding to
-     * the interface method invoked on the proxy instance.  The declaring
-     * class of the {@code Method} object will be the interface that
-     * the method was declared in, which may be a superinterface of the
-     * proxy interface that the proxy class inherits the method through.
+     * @param method 原始方法，这里在客户端本地是没有方法实现的，
+     *               所以只用作承载方法名、参数类型。
      *
-     * @param args an array of objects containing the values of the
-     * arguments passed in the method invocation on the proxy instance,
-     * or {@code null} if interface method takes no arguments.
-     * Arguments of primitive types are wrapped in instances of the
-     * appropriate primitive wrapper class, such as
-     * {@code java.lang.Integer} or {@code java.lang.Boolean}.
+     * @param args 用来传递给方法的参数，同一为Object类型。
      *
      * @return RpcResponse
-     * @throws Throwable
      */
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) {
+        logger.info("调用方法: {}#{}", method.getDeclaringClass().getName(), method.getName());
         RpcRequest rpcRequest = RpcRequest.builder()
                 .interfaceName(method.getDeclaringClass().getName())
                 .methodName(method.getName())
@@ -64,6 +60,7 @@ public class RpcClientProxy implements InvocationHandler {
                 .paramTypes(method.getParameterTypes())
                 .build();
         RpcClient rpcClient = new RpcClient();
-        return ((RpcResponse)rpcClient.sendRequest(rpcRequest, host, port)).getData();
+        // proxy不负责解析收到的RpcResponse
+        return rpcClient.sendRequest(rpcRequest, host, port);
     }
 }
