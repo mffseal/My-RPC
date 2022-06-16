@@ -12,4 +12,5 @@ public interface HelloService {
      * @return 测试用的调用结果
      */
     String hello(HelloObject object);
+    String bye(HelloObject object);
 }

@@ -14,6 +14,12 @@ public class HelloServiceImpl implements HelloService {
     @Override
     public String hello(HelloObject object) {
         logger.info("接收到: {}", object.getMessage());
-        return "这是rpc调用的返回值, id=" + object.getId();
+        return "hello 这是rpc调用的返回值, id=" + object.getId();
+    }
+
+    @Override
+    public String bye(HelloObject object) {
+        logger.info("接收到: {}", object.getMessage());
+        return "bye 这是rpc调用的返回值, id=" + object.getId();
     }
 }

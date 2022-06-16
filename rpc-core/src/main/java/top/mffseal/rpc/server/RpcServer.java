@@ -18,7 +18,7 @@ public class RpcServer {
     private static final Logger logger = LoggerFactory.getLogger(RpcServer.class);
 
     /**
-     * 初始化线程池。
+     * 初始化工作线程池。
      */
     public RpcServer() {
         int corePoolSize = 5;
@@ -29,10 +29,17 @@ public class RpcServer {
         threadPool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue, threadFactory);
     }
 
+    /**
+     * 注册服务。
+     * @param service 要注册的具体服务对象
+     * @param port 端口
+     */
     public void register(Object service, int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             logger.info("服务器启动中...");
             Socket socket;
+            logger.info("{}", serverSocket);
+            // 每收到一个请求，就创建一个工作线程
             while ((socket = serverSocket.accept()) != null) {
                 logger.info("客户端连接! IP: " + socket.getInetAddress());
                 threadPool.execute(new WorkerThread(socket, service));

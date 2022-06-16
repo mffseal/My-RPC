@@ -27,12 +27,19 @@ public class WorkerThread implements Runnable{
         this.service = service;
     }
 
+    /**
+     * 从socket获取RpcRequest，解析函数名和参数类型，绑定到service上对应方法，
+     * 使用RpcRequest携带的参数执行方法，
+     * 向socket写入RpcResponse。
+     */
     @Override
     public void run() {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
             RpcRequest rpcRequest = (RpcRequest) objectInputStream.readObject();
+            // 利用RpcRequest中指定的方法名和参数类型，找到service中对应的方法
             Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParamTypes());
+            // 调用service中对应的方法
             Object returnObject = method.invoke(service, rpcRequest.getParameters());
             objectOutputStream.writeObject(RpcResponse.success(returnObject));
             objectOutputStream.flush();

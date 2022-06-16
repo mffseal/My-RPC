@@ -8,8 +8,10 @@ import top.mffseal.rpc.server.RpcServer;
  */
 public class TestServer {
     public static void main(String[] args) {
+        // 具体的服务实现
         HelloService helloService = new HelloServiceImpl();
         RpcServer rpcServer = new RpcServer();
+        // 注册服务
         rpcServer.register(helloService, 9000);
     }
 }
