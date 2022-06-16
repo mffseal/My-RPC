@@ -2,6 +2,8 @@ package top.mffseal.rpc.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.registry.DefaultServiceRegistry;
+import top.mffseal.rpc.registry.ServiceRegistry;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -14,27 +16,32 @@ import java.util.concurrent.*;
  * @author mffseal
  */
 public class RpcServer {
-    private final ExecutorService threadPool;
     private static final Logger logger = LoggerFactory.getLogger(RpcServer.class);
+
+    private static final int CORE_POOL_SIZE = 5;
+    private static final int MAXIMUM_POOL_SIZE = 50;
+    private static final int KEEP_ALIVE_TIME = 60;
+    private static final int BLOCKING_QUEUE_CAPACITY = 100;
+    private final  ExecutorService threadPool;
+    private final ServiceRegistry serviceRegistry;
+    private final RequestHandler requestHandler = new RequestHandler();
 
     /**
      * 初始化工作线程池。
      */
-    public RpcServer() {
-        int corePoolSize = 5;
-        int maximumPoolSize = 50;
-        int keepAliveTime = 60;
+    public RpcServer(ServiceRegistry serviceRegistry) {
+        this.serviceRegistry = serviceRegistry;
+
         BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(100);
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
-        threadPool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue, threadFactory);
+        threadPool = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, CORE_POOL_SIZE, TimeUnit.SECONDS, workQueue, threadFactory);
     }
 
     /**
      * 注册服务。
-     * @param service 要注册的具体服务对象
      * @param port 端口
      */
-    public void register(Object service, int port) {
+    public void start(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             logger.info("服务器启动中...");
             Socket socket;
@@ -42,8 +49,9 @@ public class RpcServer {
             // 每收到一个请求，就创建一个工作线程
             while ((socket = serverSocket.accept()) != null) {
                 logger.info("客户端连接! IP: " + socket.getInetAddress() + ":" + socket.getPort());
-                threadPool.execute(new RequestHandler(socket, service));
+                threadPool.execute(new RequestHandlerThread(socket, requestHandler, serviceRegistry));
             }
+            threadPool.shutdown();
         } catch (IOException e) {
             logger.error("连接时发生错误: ", e);
         }

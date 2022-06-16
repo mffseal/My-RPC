@@ -3,6 +3,7 @@ package top.mffseal.rpc.exception;
 import top.mffseal.rpc.enumeration.RpcError;
 
 /**
+ * RPC调用自定义异常，服务端异常处理所用。
  * @author mffseal
  */
 public class RpcException extends RuntimeException{
