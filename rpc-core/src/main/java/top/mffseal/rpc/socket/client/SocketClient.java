@@ -1,7 +1,8 @@
-package top.mffseal.rpc.client;
+package top.mffseal.rpc.socket.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.RpcClient;
 import top.mffseal.rpc.entity.RpcRequest;
 import top.mffseal.rpc.entity.RpcResponse;
 import top.mffseal.rpc.enumeration.ResponseCode;
@@ -14,21 +15,28 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
- * rpc客户端，用于向服务端发起rpc请求，
- * 该类负责解析收到的数据，解析成RpcResponse。
+ * rpc客户端，基于原生Socket的BIO网络通讯，负责：
+ * 向服务端发起rpc请求，并接收服务器端发回的网络数据；
+ * 解析收到的数据，转换成成RpcResponse。
  * @author mffseal
  */
-public class RpcClient {
-    private static final Logger logger = LoggerFactory.getLogger(RpcClient.class);
+public class SocketClient implements RpcClient {
+    private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
+
+    private final String host;
+    private final int port;
+
+    public SocketClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
 
     /**
      * 向服务者发送rpc请求。
      * @param rpcRequest 请求对象
-     * @param host 目标主机
-     * @param port 目标端口
      * @return 响应对象
      */
-    public Object sendRequest(RpcRequest rpcRequest, String host, int port) {
+    public Object sendRequest(RpcRequest rpcRequest) {
         // 使用自带Socket通讯
         try (Socket socket = new Socket(host, port)) {
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());

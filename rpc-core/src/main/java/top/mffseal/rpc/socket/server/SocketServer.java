@@ -1,8 +1,9 @@
-package top.mffseal.rpc.server;
+package top.mffseal.rpc.socket.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.registry.DefaultServiceRegistry;
+import top.mffseal.rpc.RequestHandler;
+import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.registry.ServiceRegistry;
 
 import java.io.IOException;
@@ -11,12 +12,14 @@ import java.net.Socket;
 import java.util.concurrent.*;
 
 /**
- * rpc服务端，使用一个ServerSocket监听某个端口，循环接收连接请求，
- * 如果发来了请求就创建一个线程，在新线程中处理调用。
+ * rpc服务端，基于原生Socket网络通讯，实现：
+ * 使用一个ServerSocket监听某个端口，循环接收连接请求；
+ * 对新请求创建一个线程，将请求包装成RequestHandlerThread；
+ * 将RequestHandlerThread交给新线程处理。
  * @author mffseal
  */
-public class RpcServer {
-    private static final Logger logger = LoggerFactory.getLogger(RpcServer.class);
+public class SocketServer implements RpcServer {
+    private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
 
     private static final int CORE_POOL_SIZE = 5;
     private static final int MAXIMUM_POOL_SIZE = 50;
@@ -29,7 +32,7 @@ public class RpcServer {
     /**
      * 初始化工作线程池。
      */
-    public RpcServer(ServiceRegistry serviceRegistry) {
+    public SocketServer(ServiceRegistry serviceRegistry) {
         this.serviceRegistry = serviceRegistry;
 
         BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(100);
@@ -48,7 +51,7 @@ public class RpcServer {
             logger.info("{}", serverSocket);
             // 每收到一个请求，就创建一个工作线程
             while ((socket = serverSocket.accept()) != null) {
-                logger.info("客户端连接! IP: " + socket.getInetAddress() + ":" + socket.getPort());
+                logger.info("客户端连接! 地址: " + socket.getInetAddress() + ":" + socket.getPort());
                 threadPool.execute(new RequestHandlerThread(socket, requestHandler, serviceRegistry));
             }
             threadPool.shutdown();

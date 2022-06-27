@@ -1,21 +1,22 @@
-package top.mffseal.rpc.server;
+package top.mffseal.rpc.socket.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.RequestHandler;
 import top.mffseal.rpc.entity.RpcRequest;
-import top.mffseal.rpc.entity.RpcResponse;
-import top.mffseal.rpc.enumeration.ResponseCode;
 import top.mffseal.rpc.registry.ServiceRegistry;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.Socket;
 
 /**
- * 处理RpcRequest的工作线程，只负责对多个流程的调度。
+ * 处理RpcRequest的工作线程，流程：
+ * 解析请求；
+ * 调用rpc处理器；
+ * 包装response；
+ * 向客户端发送响应；
  * @author mffseal
  */
 public class RequestHandlerThread implements Runnable{

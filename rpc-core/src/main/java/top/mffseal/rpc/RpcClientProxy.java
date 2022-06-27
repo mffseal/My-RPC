@@ -1,10 +1,9 @@
-package top.mffseal.rpc.client;
+package top.mffseal.rpc;
 
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequest;
-import top.mffseal.rpc.entity.RpcResponse;
+import top.mffseal.rpc.socket.client.SocketClient;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -17,13 +16,12 @@ import java.lang.reflect.Proxy;
  */
 
 public class RpcClientProxy implements InvocationHandler {
-    private String host;
-    private int port;
     private static final Logger logger = LoggerFactory.getLogger(RpcClientProxy.class);
 
-    public RpcClientProxy(String host, int port) {
-        this.host = host;
-        this.port = port;
+    private final RpcClient client;
+
+    public RpcClientProxy(RpcClient client) {
+        this.client = client;
     }
 
     /**
@@ -59,8 +57,7 @@ public class RpcClientProxy implements InvocationHandler {
                 .parameters(args)
                 .paramTypes(method.getParameterTypes())
                 .build();
-        RpcClient rpcClient = new RpcClient();
         // proxy不负责解析收到的RpcResponse
-        return rpcClient.sendRequest(rpcRequest, host, port);
+        return client.sendRequest(rpcRequest);
     }
 }
