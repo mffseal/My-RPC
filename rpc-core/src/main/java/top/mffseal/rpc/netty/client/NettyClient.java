@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RpcClient;
 import top.mffseal.rpc.codec.CommonCodec;
+import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 
@@ -32,7 +33,7 @@ public class NettyClient implements RpcClient {
     // 配置客户端信息
     static {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        LoggingHandler LOGGING_HANDLER = new LoggingHandler(LogLevel.DEBUG);
+        LoggingHandler LOGGING_HANDLER = new LoggingHandler(Config.getNettyClientLogLevel());
         CommonCodec COMMON_CODEC = new CommonCodec();
         NettyClientHandler RESPONSE_HANDLER = new NettyClientHandler();
 

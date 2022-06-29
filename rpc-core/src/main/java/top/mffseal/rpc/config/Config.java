@@ -1,5 +1,6 @@
 package top.mffseal.rpc.config;
 
+import io.netty.handler.logging.LogLevel;
 import top.mffseal.rpc.serializer.Serializer;
 
 import java.io.IOException;
@@ -49,6 +50,31 @@ public class Config {
         } else {
             return Integer.parseInt(value);
         }
+    }
+
+    /**
+     * 配置netty日志级别。
+     * @return 日志级别
+     */
+    private static LogLevel getNettyLogLevel(String property) {
+        String value = properties.getProperty(property);
+        if (value == null) {
+            return LogLevel.ERROR;
+        } else {
+            return LogLevel.valueOf(value);
+        }
+    }
+
+    /**
+     * 配置netty服务器日志级别。
+     * @return 日志级别
+     */
+    public static LogLevel getNettyServerLogLevel() {
+        return getNettyLogLevel("server.netty.loglevel");
+    }
+
+    public static LogLevel getNettyClientLogLevel() {
+        return getNettyLogLevel("client.netty.loglevel");
     }
 
 

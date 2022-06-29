@@ -28,7 +28,7 @@ public class NettyServer implements RpcServer {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         CommonCodec COMMON_CODEC = new CommonCodec();
         NettyServerHandler REQUEST_HANDLER = new NettyServerHandler();
-        LoggingHandler LOGGING_HANDLER = new LoggingHandler(LogLevel.DEBUG);
+        LoggingHandler LOGGING_HANDLER = new LoggingHandler(Config.getNettyServerLogLevel());
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
