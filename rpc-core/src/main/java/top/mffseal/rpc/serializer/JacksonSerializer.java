@@ -33,7 +33,6 @@ public class JacksonSerializer implements Serializer {
             Object obj = objectMapper.readValue(bytes, clazz);
 
             // RpcRequest中的参数列表进行处理
-            // TODO: 2022/6/28 疑似存在问题
             if (obj instanceof RpcRequestMessage) {
                 obj = handleRequest(obj);
             }

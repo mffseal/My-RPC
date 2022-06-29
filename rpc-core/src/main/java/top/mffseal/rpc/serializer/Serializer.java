@@ -41,6 +41,19 @@ public interface Serializer {
                 return jackson.deserialize(bytes, clazz);
             }
         },
+        Native {
+            private final Serializer nativeSer = new NativeSerializer();
+            @Override
+            public byte[] serialize(Object obj) {
+                return nativeSer.serialize(obj);
+            }
+
+            @Override
+            public Object deserialize(byte[] bytes, Class<?> clazz) {
+                return nativeSer.deserialize(bytes, clazz);
+            }
+        },
+
     }
 
 }
