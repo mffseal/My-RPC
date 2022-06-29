@@ -6,10 +6,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.entity.Message;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
-import top.mffseal.rpc.serializer.CommonSerializer;
+import top.mffseal.rpc.serializer.Serializer;
 
 import java.util.List;
 
@@ -34,19 +35,14 @@ import java.util.List;
 public class CommonCodec extends MessageToMessageCodec<ByteBuf, Message> {
     private static final Logger log = LoggerFactory.getLogger(CommonCodec.class);
     private static final int MAGIC_NUMBER = 0xCAFEBABE;
-    private final CommonSerializer serializer;
-
-    public CommonCodec(CommonSerializer serializer) {
-        this.serializer = serializer;
-    }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> outList) throws Exception {
         ByteBuf out = ctx.alloc().buffer();
         out.writeInt(MAGIC_NUMBER);  // 魔数
         out.writeInt(msg.getMessageType());  // 消息类型
-        out.writeInt(serializer.getCode());  // 序列化类型
-        byte[] bytes = serializer.serialize(msg);
+        out.writeInt(Config.getSerializerLibrary().ordinal());  // 序列化类型
+        byte[] bytes = Config.getSerializerLibrary().serialize(msg);  // 通过配置类获取序列化架构
         out.writeInt(bytes.length);  // 序列化长度
         out.writeBytes(bytes);  // 序列化内容
         outList.add(out);
@@ -71,7 +67,7 @@ public class CommonCodec extends MessageToMessageCodec<ByteBuf, Message> {
 
         // 序列化器类型
         int serializerCode = in.readInt();
-        CommonSerializer serializer = CommonSerializer.getByCode(serializerCode);
+        Serializer serializer = Serializer.Library.values()[serializerCode];
         if (serializer == null) {
             log.error("未识别的反序列化器类型ID: {}", serializerCode);
             throw new RpcException(RpcError.UNKNOWN_SERIALIZER);

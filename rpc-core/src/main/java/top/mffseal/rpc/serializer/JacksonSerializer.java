@@ -13,8 +13,8 @@ import java.io.IOException;
  *
  * @author mffseal
  */
-public class JsonSerializer implements CommonSerializer {
-    private static final Logger log = LoggerFactory.getLogger(JsonSerializer.class);
+public class JacksonSerializer implements Serializer {
+    private static final Logger log = LoggerFactory.getLogger(JacksonSerializer.class);
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -66,10 +66,5 @@ public class JsonSerializer implements CommonSerializer {
             }
         }
         return rpcRequestMessage;
-    }
-
-    @Override
-    public int getCode() {
-        return 1;
     }
 }

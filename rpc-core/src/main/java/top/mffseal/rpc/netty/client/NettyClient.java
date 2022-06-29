@@ -14,7 +14,6 @@ import top.mffseal.rpc.RpcClient;
 import top.mffseal.rpc.codec.CommonCodec;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
-import top.mffseal.rpc.serializer.JsonSerializer;
 
 /**
  * @author mffseal
@@ -34,8 +33,7 @@ public class NettyClient implements RpcClient {
     static {
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         LoggingHandler LOGGING_HANDLER = new LoggingHandler(LogLevel.DEBUG);
-        JsonSerializer jsonSerializer = new JsonSerializer();
-        CommonCodec COMMON_CODEC = new CommonCodec(jsonSerializer);
+        CommonCodec COMMON_CODEC = new CommonCodec();
         NettyClientHandler RESPONSE_HANDLER = new NettyClientHandler();
 
         bootstrap = new Bootstrap();

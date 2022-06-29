@@ -4,6 +4,7 @@ import top.mffseal.rpc.RpcClient;
 import top.mffseal.rpc.RpcClientProxy;
 import top.mffseal.rpc.api.HelloObject;
 import top.mffseal.rpc.api.HelloService;
+import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.socket.client.SocketClient;
 
 /**
@@ -11,7 +12,7 @@ import top.mffseal.rpc.socket.client.SocketClient;
  */
 public class SocketTestClient {
     public static void main(String[] args) {
-        RpcClient client = new SocketClient("127.0.0.1", 9000);
+        RpcClient client = new SocketClient("127.0.0.1", Config.getServerPort());
         // 客户端增强代理
         // 拦截器会拦截调用请求，将调用包装成RpcRequest并使用RpcClient将请求发送到服务端
         RpcClientProxy proxy = new RpcClientProxy(client);

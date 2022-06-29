@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.codec.CommonCodec;
-import top.mffseal.rpc.serializer.JsonSerializer;
+import top.mffseal.rpc.config.Config;
 
 /**
  * @author mffseal
@@ -26,8 +26,7 @@ public class NettyServer implements RpcServer {
     public void start(int port) {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        JsonSerializer jsonSerializer = new JsonSerializer();
-        CommonCodec COMMON_CODEC = new CommonCodec(jsonSerializer);
+        CommonCodec COMMON_CODEC = new CommonCodec();
         NettyServerHandler REQUEST_HANDLER = new NettyServerHandler();
         LoggingHandler LOGGING_HANDLER = new LoggingHandler(LogLevel.DEBUG);
         try {
@@ -47,7 +46,7 @@ public class NettyServer implements RpcServer {
                         }
                     });
             // 同步等待服务器绑定端口
-            ChannelFuture future = serverBootstrap.bind(8080).sync();
+            ChannelFuture future = serverBootstrap.bind(Config.getServerPort()).sync();
             // 同步等待服务器结束
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
