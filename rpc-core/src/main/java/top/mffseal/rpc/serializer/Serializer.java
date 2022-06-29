@@ -28,6 +28,7 @@ public interface Serializer {
      * 定义序列化枚举的内部枚举类，与Config配置类配合使用。
      */
     enum Library implements Serializer {
+        // TODO: 2022/6/29 优化代码冗余
         Jackson {
             private final Serializer jackson = new JacksonSerializer();
 
@@ -53,6 +54,18 @@ public interface Serializer {
                 return nativeSer.deserialize(bytes, clazz);
             }
         },
+        Kryo {
+            private final Serializer kryo = new KryoSerializer();
+            @Override
+            public byte[] serialize(Object obj) {
+                return kryo.serialize(obj);
+            }
+
+            @Override
+            public Object deserialize(byte[] bytes, Class<?> clazz) {
+                return kryo.deserialize(bytes, clazz);
+            }
+        }
 
     }
 
