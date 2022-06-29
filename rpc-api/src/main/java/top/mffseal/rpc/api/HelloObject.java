@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 /**
  * 客户端向服务端传递的参数对应的类。
+ *
  * @author mffseal
  */
 @Data
@@ -14,4 +15,7 @@ import java.io.Serializable;
 public class HelloObject implements Serializable {
     private Integer id;
     private String message;
+
+    public HelloObject() {
+    }
 }

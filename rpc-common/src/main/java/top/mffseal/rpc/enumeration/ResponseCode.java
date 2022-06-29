@@ -6,6 +6,7 @@ import lombok.Getter;
 /**
  * 服务者执行完毕后的返回数据，包含执行相关状态和信息，以及执行结果。
  * 发送给客户端所用。
+ *
  * @author mffseal
  */
 @AllArgsConstructor

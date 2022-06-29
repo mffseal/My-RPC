@@ -1,9 +1,9 @@
 package top.mffseal.test;
 
 import top.mffseal.rpc.RpcClient;
+import top.mffseal.rpc.RpcClientProxy;
 import top.mffseal.rpc.api.HelloObject;
 import top.mffseal.rpc.api.HelloService;
-import top.mffseal.rpc.RpcClientProxy;
 import top.mffseal.rpc.socket.client.SocketClient;
 
 /**

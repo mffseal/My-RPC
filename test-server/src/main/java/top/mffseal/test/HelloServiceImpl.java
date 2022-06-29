@@ -1,4 +1,5 @@
 package top.mffseal.test;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.api.HelloObject;
@@ -14,7 +15,8 @@ public class HelloServiceImpl implements HelloService {
     @Override
     public String hello(HelloObject object) {
         logger.info("接收到: {}", object.getMessage());
-        return "hello 这是rpc调用的返回值, id=" + object.getId();
+        String res = "hello 这是rpc调用的返回值, id=" + object.getId();
+        return res;
     }
 
     @Override

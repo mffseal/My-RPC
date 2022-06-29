@@ -16,6 +16,7 @@ import java.util.concurrent.*;
  * 使用一个ServerSocket监听某个端口，循环接收连接请求；
  * 对新请求创建一个线程，将请求包装成RequestHandlerThread；
  * 将RequestHandlerThread交给新线程处理。
+ *
  * @author mffseal
  */
 public class SocketServer implements RpcServer {
@@ -25,7 +26,7 @@ public class SocketServer implements RpcServer {
     private static final int MAXIMUM_POOL_SIZE = 50;
     private static final int KEEP_ALIVE_TIME = 60;
     private static final int BLOCKING_QUEUE_CAPACITY = 100;
-    private final  ExecutorService threadPool;
+    private final ExecutorService threadPool;
     private final ServiceRegistry serviceRegistry;
     private final RequestHandler requestHandler = new RequestHandler();
 
@@ -42,6 +43,7 @@ public class SocketServer implements RpcServer {
 
     /**
      * 注册服务。
+     *
      * @param port 端口
      */
     public void start(int port) {

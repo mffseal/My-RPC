@@ -3,7 +3,7 @@ package top.mffseal.rpc.socket.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RequestHandler;
-import top.mffseal.rpc.entity.RpcRequest;
+import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.registry.ServiceRegistry;
 
 import java.io.IOException;
@@ -17,9 +17,10 @@ import java.net.Socket;
  * 调用rpc处理器；
  * 包装response；
  * 向客户端发送响应；
+ *
  * @author mffseal
  */
-public class RequestHandlerThread implements Runnable{
+public class RequestHandlerThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandlerThread.class);
     private Socket socket;
@@ -39,11 +40,11 @@ public class RequestHandlerThread implements Runnable{
     public void run() {
         try (ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
-            RpcRequest rpcRequest = (RpcRequest) objectInputStream.readObject();
-            String interfaceName = rpcRequest.getInterfaceName();
+            RpcRequestMessage rpcRequestMessage = (RpcRequestMessage) objectInputStream.readObject();
+            String interfaceName = rpcRequestMessage.getInterfaceName();
             logger.info("需要查找的接口名: {}", interfaceName);
             Object service = serviceRegistry.getService(interfaceName);
-            Object rpcResponse = requestHandler.handle(rpcRequest, service);
+            Object rpcResponse = requestHandler.handle(rpcRequestMessage, service);
             objectOutputStream.writeObject(rpcResponse);
             objectOutputStream.flush();
         } catch (IOException | ClassNotFoundException e) {

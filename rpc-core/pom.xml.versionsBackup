@@ -5,22 +5,16 @@
     <parent>
         <artifactId>My-RPC</artifactId>
         <groupId>top.mffseal</groupId>
-        <version>2.0-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>test-client</artifactId>
+    <artifactId>rpc-core</artifactId>
     <dependencies>
         <dependency>
             <groupId>top.mffseal</groupId>
-            <artifactId>rpc-core</artifactId>
-            <version>2.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>top.mffseal</groupId>
-            <artifactId>rpc-api</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <artifactId>rpc-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
