@@ -38,6 +38,15 @@ public class Config {
         }
     }
 
+    public static boolean getKryoCompress() {
+        String value = properties.getProperty("serializer.kryo.compress");
+        if (value==null) {
+            return false;
+        } else {
+            return Boolean.parseBoolean(value);
+        }
+    }
+
     /**
      * 配置服务器监听端口。
      *

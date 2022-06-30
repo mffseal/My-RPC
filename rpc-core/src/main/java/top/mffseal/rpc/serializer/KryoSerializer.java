@@ -14,10 +14,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
+ * Kryo序列化实现。
  * @author mffseal
  */
+// TODO: 2022/6/30 kryo数据压缩研究
 public class KryoSerializer implements Serializer {
     private static final Logger log = LoggerFactory.getLogger(KryoSerializer.class);
+
+    /**
+     * Kryo实例不是线程安全的，每个线程需要独立的Kryo对象。
+     */
     private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.register(RpcResponseMessage.class);

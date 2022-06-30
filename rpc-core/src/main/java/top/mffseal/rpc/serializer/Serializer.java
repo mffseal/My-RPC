@@ -25,7 +25,7 @@ public interface Serializer {
     Object deserialize(byte[] bytes, Class<?> clazz);
 
     /**
-     * 定义序列化枚举的内部枚举类，与Config配置类配合使用。
+     * 序列化框架注册表。
      */
     enum Library implements Serializer {
         // TODO: 2022/6/29 优化代码冗余
