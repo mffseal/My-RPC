@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RequestHandler;
 import top.mffseal.rpc.RpcServer;
+import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.registry.ServiceRegistry;
 
 import java.io.IOException;
@@ -43,11 +44,9 @@ public class SocketServer implements RpcServer {
 
     /**
      * 注册服务。
-     *
-     * @param port 端口
      */
-    public void start(int port) {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+    public void start() {
+        try (ServerSocket serverSocket = new ServerSocket(Config.getServerPort())) {
             logger.info("服务器启动中...");
             Socket socket;
             logger.info("{}", serverSocket);

@@ -12,7 +12,7 @@ import top.mffseal.rpc.netty.client.NettyClient;
  */
 public class NettyTestClient {
     public static void main(String[] args) {
-        RpcClient client = new NettyClient("localhost", Config.getServerPort());
+        RpcClient client = new NettyClient(Config.getServerHost(), Config.getServerPort());
         RpcClientProxy rpcClientProxy = new RpcClientProxy(client);
         HelloService helloServer = rpcClientProxy.getProxy(HelloService.class);
         HelloObject helloObject = new HelloObject(12, "this is a message");

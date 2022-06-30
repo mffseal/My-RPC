@@ -8,8 +8,9 @@ import java.io.*;
 /**
  * @author mffseal
  */
-public class NativeSerializer implements Serializer{
+public class NativeSerializer implements Serializer {
     private static final Logger log = LoggerFactory.getLogger(NativeSerializer.class);
+
     @Override
     public byte[] serialize(Object obj) {
         try {

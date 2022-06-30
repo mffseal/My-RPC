@@ -53,7 +53,22 @@ public class Config {
     }
 
     /**
+     * 配置服务器IP地址。
+     *
+     * @return IP地址
+     */
+    public static String getServerHost() {
+        String value = properties.getProperty("server.host");
+        if (value == null) {
+            return "localhost";
+        } else {
+            return value;
+        }
+    }
+
+    /**
      * 配置netty日志级别。
+     *
      * @return 日志级别
      */
     private static LogLevel getNettyLogLevel(String property) {
@@ -67,6 +82,7 @@ public class Config {
 
     /**
      * 配置netty服务器日志级别。
+     *
      * @return 日志级别
      */
     public static LogLevel getNettyServerLogLevel() {

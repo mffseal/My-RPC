@@ -9,7 +9,6 @@ import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.exception.SerializeException;
 
-import javax.sql.rowset.serial.SerialException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,9 +16,9 @@ import java.io.IOException;
 /**
  * @author mffseal
  */
-public class KryoSerializer implements Serializer{
+public class KryoSerializer implements Serializer {
     private static final Logger log = LoggerFactory.getLogger(KryoSerializer.class);
-    private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(()->{
+    private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.register(RpcResponseMessage.class);
         kryo.register(RpcRequestMessage.class);
@@ -27,6 +26,7 @@ public class KryoSerializer implements Serializer{
         kryo.setRegistrationRequired(false);
         return kryo;
     });
+
     @Override
     public byte[] serialize(Object obj) {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream();

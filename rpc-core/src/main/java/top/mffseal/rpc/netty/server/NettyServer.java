@@ -23,7 +23,7 @@ public class NettyServer implements RpcServer {
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
 
     @Override
-    public void start(int port) {
+    public void start() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         CommonCodec COMMON_CODEC = new CommonCodec();
@@ -46,7 +46,7 @@ public class NettyServer implements RpcServer {
                         }
                     });
             // 同步等待服务器绑定端口
-            ChannelFuture future = serverBootstrap.bind(Config.getServerPort()).sync();
+            ChannelFuture future = serverBootstrap.bind(Config.getServerHost(), Config.getServerPort()).sync();
             // 同步等待服务器结束
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {

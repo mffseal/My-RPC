@@ -2,7 +2,6 @@ package top.mffseal.test;
 
 import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.api.HelloService;
-import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.registry.DefaultServiceRegistry;
 import top.mffseal.rpc.registry.ServiceRegistry;
 import top.mffseal.rpc.socket.server.SocketServer;
@@ -20,6 +19,6 @@ public class SocketTestServer {
 
         RpcServer rpcServer = new SocketServer(serviceRegistry);
         // 启动服务器
-        rpcServer.start(Config.getServerPort());
+        rpcServer.start();
     }
 }

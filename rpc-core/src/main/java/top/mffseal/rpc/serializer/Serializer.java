@@ -44,6 +44,7 @@ public interface Serializer {
         },
         Native {
             private final Serializer nativeSer = new NativeSerializer();
+
             @Override
             public byte[] serialize(Object obj) {
                 return nativeSer.serialize(obj);
@@ -56,6 +57,7 @@ public interface Serializer {
         },
         Kryo {
             private final Serializer kryo = new KryoSerializer();
+
             @Override
             public byte[] serialize(Object obj) {
                 return kryo.serialize(obj);
