@@ -40,7 +40,7 @@ public class Config {
 
     public static boolean getKryoCompress() {
         String value = properties.getProperty("serializer.kryo.compress");
-        if (value==null) {
+        if (value == null) {
             return false;
         } else {
             return Boolean.parseBoolean(value);

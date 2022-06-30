@@ -15,6 +15,7 @@ import java.io.IOException;
 
 /**
  * Kryo序列化实现。
+ *
  * @author mffseal
  */
 // TODO: 2022/6/30 kryo数据压缩研究

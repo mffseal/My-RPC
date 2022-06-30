@@ -2,6 +2,7 @@ package top.mffseal.rpc.serializer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.exception.SerializeException;
 
 import java.io.*;
 
@@ -20,8 +21,8 @@ public class NativeSerializer implements Serializer {
             return bos.toByteArray();
         } catch (IOException e) {
             log.error("序列化失败: ", e);
+            throw new SerializeException("序列化失败");
         }
-        return null;
     }
 
     @Override
@@ -32,7 +33,7 @@ public class NativeSerializer implements Serializer {
             return ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             log.error("反序列化失败", e);
+            throw new SerializeException("反序列化失败");
         }
-        return null;
     }
 }

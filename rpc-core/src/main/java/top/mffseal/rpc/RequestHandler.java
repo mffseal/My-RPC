@@ -50,6 +50,7 @@ public class RequestHandler {
         if (!clazz.isAssignableFrom(service.getClass())) {
             return RpcResponseMessage.fail(ResponseCode.CLASS_NOT_FOUND);
         }
+
         Method method;
         try {
             // 利用RpcRequest中指定的方法名和参数类型，找到service中对应的方法
@@ -57,11 +58,19 @@ public class RequestHandler {
         } catch (NoSuchMethodException e) {
             return RpcResponseMessage.fail(ResponseCode.METHOD_NOT_FOUND);
         }
-        // 调用service中对应的方法
-        Object returnObject = method.invoke(service, rpcRequestMessage.getParameters());
+
+        Object returnObject = null;
+        try {
+            // 调用service中对应的方法
+            returnObject = method.invoke(service, rpcRequestMessage.getParameters());
+
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            logger.error("目标方法调用失败: ", e);
+        }
         if (returnObject == null) {
             return RpcResponseMessage.fail(ResponseCode.FAIL);
+        } else {
+            return RpcResponseMessage.success(returnObject);
         }
-        return RpcResponseMessage.success(returnObject);
     }
 }
