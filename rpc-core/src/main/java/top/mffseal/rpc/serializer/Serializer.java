@@ -2,8 +2,6 @@ package top.mffseal.rpc.serializer;
 
 import top.mffseal.rpc.entity.RpcRequestMessage;
 
-import java.io.IOException;
-
 /**
  * 通用反序列化接口
  *
@@ -38,8 +36,9 @@ public interface Serializer {
         /**
          * 针对参数列表，遍历拿到每个object和ParamTypes数组中对应的每个参数类型，
          * 将每个参数重新序列化，回复json丢失的类信息。
+         *
          * @param _this this指针
-         * @param obj rpc请求
+         * @param obj   rpc请求
          * @return 处理后的rpc请求
          */
         public static Object handleRequestParametersList(Serializer _this, Object obj) {
