@@ -7,10 +7,9 @@ import top.mffseal.rpc.entity.RpcRequestMessage;
  *
  * @author mffseal
  */
-// TODO: 2022/6/28 使用配置文件配置序列化架构
 public interface Serializer {
     /**
-     * 序列化方法
+     * 序列化方法。
      *
      * @param obj 待序列化对象
      * @return byte数组
@@ -18,7 +17,7 @@ public interface Serializer {
     byte[] serialize(Object obj);
 
     /**
-     * 反序列化方法
+     * 反序列化方法。
      *
      * @param bytes byte数组
      * @param clazz 目标类

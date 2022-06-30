@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RequestHandler;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.registry.ServiceRegistry;
+import top.mffseal.rpc.socket.util.ObjectReader;
+import top.mffseal.rpc.socket.util.ObjectWriter;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -23,9 +23,9 @@ import java.net.Socket;
 public class RequestHandlerThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandlerThread.class);
-    private Socket socket;
-    private RequestHandler requestHandler;
-    private ServiceRegistry serviceRegistry;
+    private final Socket socket;
+    private final RequestHandler requestHandler;
+    private final ServiceRegistry serviceRegistry;
 
     public RequestHandlerThread(Socket socket, RequestHandler requestHandler, ServiceRegistry serviceRegistry) {
         this.socket = socket;
@@ -38,16 +38,15 @@ public class RequestHandlerThread implements Runnable {
      */
     @Override
     public void run() {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream())) {
-            RpcRequestMessage rpcRequestMessage = (RpcRequestMessage) objectInputStream.readObject();
+        try (InputStream inputStream = socket.getInputStream();
+             OutputStream outputStream = socket.getOutputStream()) {
+            RpcRequestMessage rpcRequestMessage = (RpcRequestMessage) ObjectReader.readObject(inputStream);
             String interfaceName = rpcRequestMessage.getInterfaceName();
             logger.info("需要查找的接口名: {}", interfaceName);
             Object service = serviceRegistry.getService(interfaceName);
             Object rpcResponse = requestHandler.handle(rpcRequestMessage, service);
-            objectOutputStream.writeObject(rpcResponse);
-            objectOutputStream.flush();
-        } catch (IOException | ClassNotFoundException e) {
+            ObjectWriter.writeObject(outputStream, rpcResponse);
+        } catch (IOException e) {
             logger.error("调用或发送时有错误发生: ", e);
         }
     }

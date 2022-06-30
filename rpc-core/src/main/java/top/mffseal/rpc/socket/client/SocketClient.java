@@ -8,10 +8,10 @@ import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.enumeration.ResponseCode;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
+import top.mffseal.rpc.socket.util.ObjectReader;
+import top.mffseal.rpc.socket.util.ObjectWriter;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -41,14 +41,13 @@ public class SocketClient implements RpcClient {
     public Object sendRequest(RpcRequestMessage rpcRequestMessage) {
         // 使用自带Socket通讯
         try (Socket socket = new Socket(host, port)) {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            // 使用java自带序列化
-            objectOutputStream.writeObject(rpcRequestMessage);
-            objectOutputStream.flush();
+            OutputStream outputStream = socket.getOutputStream();
+            InputStream inputStream = socket.getInputStream();
+            // 发送请求
+            ObjectWriter.writeObject(outputStream, rpcRequestMessage);
 
-            // 在这里解析收到的RpcResponse
-            RpcResponseMessage rpcResponseMessage = (RpcResponseMessage) objectInputStream.readObject();
+            // 接收响应
+            RpcResponseMessage rpcResponseMessage = (RpcResponseMessage) ObjectReader.readObject(inputStream);
             if (rpcResponseMessage == null) {
                 logger.error("服务调用失败, 服务: {}", rpcRequestMessage.getInterfaceName());
                 throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, "服务: " + rpcRequestMessage.getInterfaceName());
@@ -59,7 +58,7 @@ public class SocketClient implements RpcClient {
             }
             // 返回远程方法接口指定的类型
             return rpcResponseMessage.getData();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             logger.error("rpc调用时发生错误: ", e);
             throw new RpcException("服务调用失败: ", e);
         }

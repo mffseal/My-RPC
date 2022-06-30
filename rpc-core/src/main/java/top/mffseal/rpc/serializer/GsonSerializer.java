@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 使用Gson实现的序列化器。
+ *
  * @author mffseal
  */
 public class GsonSerializer implements Serializer {
