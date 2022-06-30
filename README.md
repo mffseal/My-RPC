@@ -2,7 +2,7 @@
 
 # My-RPC
 
-A small and simple implement of roc framework.
+A small and simple implement of rpc framework.
 
 ## OSCS
 
