@@ -6,11 +6,12 @@ import top.mffseal.rpc.RequestHandler;
 import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.registry.ServiceRegistry;
+import top.mffseal.rpc.util.ThreadPoolFactory;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
 
 /**
  * rpc服务端，基于原生Socket网络通讯，实现：
@@ -23,10 +24,7 @@ import java.util.concurrent.*;
 public class SocketServer implements RpcServer {
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
 
-    private static final int CORE_POOL_SIZE = 5;
-    private static final int MAXIMUM_POOL_SIZE = 50;
-    private static final int KEEP_ALIVE_TIME = 60;
-    private static final int BLOCKING_QUEUE_CAPACITY = 100;
+
     private final ExecutorService threadPool;
     private final ServiceRegistry serviceRegistry;
     private final RequestHandler requestHandler = new RequestHandler();
@@ -37,9 +35,7 @@ public class SocketServer implements RpcServer {
     public SocketServer(ServiceRegistry serviceRegistry) {
         this.serviceRegistry = serviceRegistry;
 
-        BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(100);
-        ThreadFactory threadFactory = Executors.defaultThreadFactory();
-        threadPool = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, CORE_POOL_SIZE, TimeUnit.SECONDS, workQueue, threadFactory);
+        threadPool = ThreadPoolFactory.createDefaultThreadPool("SocketRpcServer");
     }
 
     /**

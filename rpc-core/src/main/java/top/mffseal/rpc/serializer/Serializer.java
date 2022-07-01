@@ -58,7 +58,7 @@ public interface Serializer {
     }
 
     /**
-     * 序列化框架注册表。
+     * 序列化框架注册表，将序列化实现和枚举编号对应，通过枚举特性自动设置序列化编号。
      */
     enum Library implements Serializer {
         // TODO: 2022/6/29 优化代码冗余
