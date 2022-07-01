@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.codec.CommonCodec;
+import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.Config;
 
 /**
@@ -36,10 +37,10 @@ public class NettyServer implements RpcServer {
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .option(ChannelOption.SO_BACKLOG, 256)  // 全连接队列大小
                     .option(ChannelOption.SO_KEEPALIVE, true)  // tcp保活探测
-                    .childOption(ChannelOption.TCP_NODELAY, true)  // 禁用Nagle算法 TODO: 开启并配合帧界限
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
+                        protected void initChannel(SocketChannel ch) {
+                            ch.pipeline().addLast(new ProtocolFrameDecoder());
                             ch.pipeline().addLast(LOGGING_HANDLER);
                             ch.pipeline().addLast(COMMON_CODEC);  // 编解码handler
                             ch.pipeline().addLast(REQUEST_HANDLER);  // 请求处理handler
