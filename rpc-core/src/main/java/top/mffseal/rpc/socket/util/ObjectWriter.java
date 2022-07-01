@@ -38,10 +38,10 @@ public class ObjectWriter {
     private static byte[] intToBytes(int intNum) {
         byte[] des = new byte[4];
         // 数字低位放在byte数组中的低位
-        des[3] = (byte) ((intNum >> 24) & 0xFF);
-        des[2] = (byte) ((intNum >> 16) & 0xFF);
-        des[1] = (byte) ((intNum >> 8) & 0xFF);
-        des[0] = (byte) (intNum & 0xFF);
+        des[0] = (byte) ((intNum >> 24) & 0xFF);
+        des[1] = (byte) ((intNum >> 16) & 0xFF);
+        des[2] = (byte) ((intNum >> 8) & 0xFF);
+        des[3] = (byte) (intNum & 0xFF);
         return des;
     }
 }
