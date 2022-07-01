@@ -30,7 +30,7 @@ public class RequestHandler {
         Object result = null;
         try {
             result = invokeTargetMethod(rpcRequestMessage, service);
-            logger.info("服务:{} 成功调用方法:{}", rpcRequestMessage.getInterfaceName(), rpcRequestMessage.getMethodName());
+            logger.info("服务:{} ID:{} 成功调用方法:{}", rpcRequestMessage.getInterfaceName(), rpcRequestMessage.getSequenceId(), rpcRequestMessage.getMethodName());
         } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
             logger.error("调用或发送时有错误发生: ", e);
         }
@@ -48,7 +48,7 @@ public class RequestHandler {
         Class<?> clazz = Class.forName(rpcRequestMessage.getInterfaceName());
         // 如果请求中指定的接口和绑定的服务不符
         if (!clazz.isAssignableFrom(service.getClass())) {
-            return RpcResponseMessage.fail(ResponseCode.CLASS_NOT_FOUND);
+            return RpcResponseMessage.fail(ResponseCode.CLASS_NOT_FOUND, rpcRequestMessage.getSequenceId());
         }
 
         Method method;
@@ -56,7 +56,7 @@ public class RequestHandler {
             // 利用RpcRequest中指定的方法名和参数类型，找到service中对应的方法
             method = service.getClass().getMethod(rpcRequestMessage.getMethodName(), rpcRequestMessage.getParamTypes());
         } catch (NoSuchMethodException e) {
-            return RpcResponseMessage.fail(ResponseCode.METHOD_NOT_FOUND);
+            return RpcResponseMessage.fail(ResponseCode.METHOD_NOT_FOUND, rpcRequestMessage.getSequenceId());
         }
 
         Object returnObject = null;
@@ -68,9 +68,9 @@ public class RequestHandler {
             logger.error("目标方法调用失败: ", e);
         }
         if (returnObject == null) {
-            return RpcResponseMessage.fail(ResponseCode.FAIL);
+            return RpcResponseMessage.fail(ResponseCode.FAIL, rpcRequestMessage.getSequenceId());
         } else {
-            return RpcResponseMessage.success(returnObject);
+            return RpcResponseMessage.success(returnObject, rpcRequestMessage.getSequenceId());
         }
     }
 }

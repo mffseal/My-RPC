@@ -18,11 +18,11 @@ import top.mffseal.rpc.registry.ServiceRegistry;
 public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequestMessage> {
     private static final Logger log = LoggerFactory.getLogger(NettyServerHandler.class);
 
-    private static RequestHandler requestHandler = new RequestHandler();
-    private static ServiceRegistry serviceRegistry = new DefaultServiceRegistry();
+    private static final RequestHandler requestHandler = new RequestHandler();
+    private static final ServiceRegistry serviceRegistry = new DefaultServiceRegistry();
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcRequestMessage msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, RpcRequestMessage msg) {
         try {
             String interfaceName = msg.getInterfaceName();  // 获取接口名
             Object service = serviceRegistry.getService(interfaceName);  // 通过接口名查到对应的服务实现

@@ -2,6 +2,7 @@ package top.mffseal.rpc.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
@@ -13,26 +14,32 @@ import lombok.ToString;
 @Getter
 @ToString(callSuper = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class RpcRequestMessage extends Message {
 
     /**
      * 被调用接口名称
      */
-    public String interfaceName;
+    private String interfaceName;
     /**
      * 被调用方法名称
      */
-    public String methodName;
+    private String methodName;
     /**
      * 调用参数列表
      */
-    public Object[] parameters;
+    private Object[] parameters;
     /**
      * 调用参数类型列表
      */
-    public Class<?>[] paramTypes;
+    private Class<?>[] paramTypes;
 
-    public RpcRequestMessage() {
+    public RpcRequestMessage(String sequenceId, String interfaceName, String methodName, Object[] parameters, Class<?>[] paramTypes) {
+        super(sequenceId);
+        this.interfaceName = interfaceName;
+        this.methodName = methodName;
+        this.parameters = parameters;
+        this.paramTypes = paramTypes;
     }
 
     @Override

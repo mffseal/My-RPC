@@ -10,8 +10,11 @@ import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
 import top.mffseal.rpc.socket.util.ObjectReader;
 import top.mffseal.rpc.socket.util.ObjectWriter;
+import top.mffseal.rpc.util.RpcMessageChecker;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 /**
@@ -47,7 +50,7 @@ public class SocketClient implements RpcClient {
             ObjectWriter.writeObject(outputStream, rpcRequestMessage);
 
             // 接收响应
-            RpcResponseMessage rpcResponseMessage = (RpcResponseMessage) ObjectReader.readObject(inputStream);
+            RpcResponseMessage<?> rpcResponseMessage = (RpcResponseMessage<?>) ObjectReader.readObject(inputStream);
             if (rpcResponseMessage == null) {
                 logger.error("服务调用失败, 服务: {}", rpcRequestMessage.getInterfaceName());
                 throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, "服务: " + rpcRequestMessage.getInterfaceName());
@@ -56,6 +59,7 @@ public class SocketClient implements RpcClient {
                 logger.error("服务调用失败, 服务: {}, 响应: {}", rpcRequestMessage.getInterfaceName(), rpcResponseMessage);
                 throw new RpcException(RpcError.SERVICE_INVOCATION_FAILURE, "服务: " + rpcRequestMessage.getInterfaceName());
             }
+            RpcMessageChecker.check(rpcRequestMessage, rpcResponseMessage);
             // 返回远程方法接口指定的类型
             return rpcResponseMessage.getData();
         } catch (IOException e) {

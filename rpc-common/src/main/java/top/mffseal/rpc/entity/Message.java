@@ -1,7 +1,9 @@
 package top.mffseal.rpc.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -11,7 +13,15 @@ import java.util.Map;
  * @author mffseal
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public abstract class Message implements Serializable {
+    /**
+     * 序列号。
+     */
+    private String sequenceId;
+
+
     /**
      * 消息子类注册列表，包含有哪些具体的子消息。
      */

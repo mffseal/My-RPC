@@ -12,6 +12,7 @@ import java.io.InputStream;
 
 /**
  * 原生socket接入统一反序列化接口，解码器。
+ *
  * @author mffseal
  */
 //TODO 和netty的解码器代码合并
@@ -22,37 +23,45 @@ public class ObjectReader {
     public static Object readObject(InputStream in) throws IOException {
         byte[] intBytes = new byte[4];
 
-        in.read(intBytes);
+        int readLens = in.read(intBytes);
         // 魔数
         int magic = bytesToInt(intBytes);
-        if (magic != MAGIC_NUMBER) {
+        if (readLens < intBytes.length | magic != MAGIC_NUMBER) {
             log.error("未识别的协议包类型: {}", magic);
             throw new RpcException(RpcError.UNKNOWN_PROTOCOL);
         }
 
         // 包类型
-        in.read(intBytes);
+        readLens = in.read(intBytes);
         int packageCode = bytesToInt(intBytes);
         Class<?> packageClass = Message.getMessageClass(packageCode);
-        if (packageClass == null) {
+        if (readLens < intBytes.length | packageClass == null) {
             log.error("未识别的rpc数据包类型ID: {}", packageCode);
             throw new RpcException(RpcError.UNKNOWN_PACKAGE_TYPE);
         }
 
         // 序列化器类型
-        in.read(intBytes);
+        readLens = in.read(intBytes);
         int serializerCode = bytesToInt(intBytes);
         Serializer serializer = Serializer.Library.values()[serializerCode];
-        if (serializer == null) {
+        if (readLens < intBytes.length | serializer == null) {
             log.error("未识别的反序列化器类型ID: {}", serializerCode);
             throw new RpcException(RpcError.UNKNOWN_SERIALIZER);
         }
 
         // 序列化数据
-        in.read(intBytes);
+        readLens = in.read(intBytes);
         int length = bytesToInt(intBytes);
+        if (readLens < intBytes.length) {
+            log.error("未识别的数据长度: {}", length);
+            throw new RpcException(RpcError.UNKNOWN_PACKAGE_LENGTH);
+        }
         byte[] bytes = new byte[length];
-        in.read(bytes);
+        readLens = in.read(bytes);
+        if (readLens < length) {
+            log.error("不完整的数据包内容: {}", bytes);
+            throw new RpcException(RpcError.INCOMPLETE_DATA);
+        }
         return serializer.deserialize(bytes, packageClass);
 
 
@@ -60,6 +69,7 @@ public class ObjectReader {
 
     /**
      * 字节数组转int，小端序兼容Netty。
+     *
      * @param bytes 字节数组
      * @return int数字
      */
@@ -67,9 +77,9 @@ public class ObjectReader {
         int intNum;
         // byte低位放的是数字低位
         intNum = (bytes[0] & 0xFF)
-                | ((bytes[1] & 0xFF)<<8)
-                | ((bytes[2] & 0xFF)<<16)
-                | ((bytes[3] & 0xFF)<<24);
+                | ((bytes[1] & 0xFF) << 8)
+                | ((bytes[2] & 0xFF) << 16)
+                | ((bytes[3] & 0xFF) << 24);
         return intNum;
     }
 

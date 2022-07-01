@@ -1,9 +1,6 @@
 package top.mffseal.rpc.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import top.mffseal.rpc.enumeration.ResponseCode;
 
 /**
@@ -15,6 +12,7 @@ import top.mffseal.rpc.enumeration.ResponseCode;
 @Setter
 @ToString(callSuper = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class RpcResponseMessage<T> extends Message {
     /**
      * 响应状态码
@@ -31,8 +29,12 @@ public class RpcResponseMessage<T> extends Message {
      */
     private T data;
 
-    public RpcResponseMessage() {
 
+    public RpcResponseMessage(String sequenceId, Integer statusCode, String statusMessage, T data) {
+        super(sequenceId);
+        this.statusCode = statusCode;
+        this.statusMessage = statusMessage;
+        this.data = data;
     }
 
     /**
@@ -42,8 +44,9 @@ public class RpcResponseMessage<T> extends Message {
      * @param <T>  执行结果的数据类型
      * @return 响应内容
      */
-    public static <T> RpcResponseMessage<T> success(T data) {
+    public static <T> RpcResponseMessage<T> success(T data, String requestId) {
         RpcResponseMessage<T> response = new RpcResponseMessage<>();
+        response.setSequenceId(requestId);
         response.setStatusCode(ResponseCode.SUCCESS.getCode());
         response.setData(data);
         return response;
@@ -56,8 +59,9 @@ public class RpcResponseMessage<T> extends Message {
      * @param <T>  执行结果的数据类型
      * @return 响应内容
      */
-    public static <T> RpcResponseMessage<T> fail(ResponseCode code) {
+    public static <T> RpcResponseMessage<T> fail(ResponseCode code, String requestId) {
         RpcResponseMessage<T> response = new RpcResponseMessage<>();
+        response.setSequenceId(requestId);
         response.setStatusCode(code.getCode());
         response.setStatusMessage(code.getMessage());
         return response;

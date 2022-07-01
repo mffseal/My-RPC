@@ -14,15 +14,16 @@ import top.mffseal.rpc.codec.CommonCodec;
 import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
+import top.mffseal.rpc.util.RpcMessageChecker;
 
 /**
  * @author mffseal
  */
 public class NettyClient implements RpcClient {
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
-    private String host;
-    private int port;
-    private static Bootstrap bootstrap;
+    private final String host;
+    private final int port;
+    private static final Bootstrap bootstrap;
 
     public NettyClient(String host, int port) {
         this.host = host;
@@ -42,7 +43,7 @@ public class NettyClient implements RpcClient {
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel ch) throws Exception {
+                    protected void initChannel(SocketChannel ch) {
                         ch.pipeline().addLast(LOGGING_HANDLER);
                         ch.pipeline().addLast(COMMON_CODEC);
                         ch.pipeline().addLast(RESPONSE_HANDLER);
@@ -68,10 +69,10 @@ public class NettyClient implements RpcClient {
                 channel.closeFuture().sync();
 
                 // 获得返回结果 RpcResponse 后，将这个对象以 key 为 ”rpcResponse“ 放入 ChannelHandlerContext 中
-                AttributeKey<RpcResponseMessage> key = AttributeKey.valueOf("rpcResponse");
-                RpcResponseMessage rpcResponseMessage = channel.attr(key).get();
-                Object data = rpcResponseMessage.getData();
-                return data;
+                AttributeKey<RpcResponseMessage<?>> key = AttributeKey.valueOf("rpcResponse" + rpcRequestMessage.getSequenceId());
+                RpcResponseMessage<?> rpcResponseMessage = channel.attr(key).get();
+                RpcMessageChecker.check(rpcRequestMessage, rpcResponseMessage);
+                return rpcResponseMessage.getData();
             }
         } catch (InterruptedException e) {
             log.error("服务器连接失败: ", e);

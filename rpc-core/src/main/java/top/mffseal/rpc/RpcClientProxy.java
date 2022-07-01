@@ -7,6 +7,7 @@ import top.mffseal.rpc.entity.RpcRequestMessage;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.UUID;
 
 /**
  * 一个代理拦截器，负责将本地调用拦截到rpc调用；
@@ -49,7 +50,7 @@ public class RpcClientProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
         logger.info("调用方法: {}#{}", method.getDeclaringClass().getName(), method.getName());
-        RpcRequestMessage rpcRequestMessage = new RpcRequestMessage(method.getDeclaringClass().getName(),
+        RpcRequestMessage rpcRequestMessage = new RpcRequestMessage(UUID.randomUUID().toString(), method.getDeclaringClass().getName(),
                 method.getName(), args, method.getParameterTypes());
         // proxy不负责解析收到的RpcResponse
         return client.sendRequest(rpcRequestMessage);

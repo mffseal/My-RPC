@@ -13,14 +13,14 @@ import top.mffseal.rpc.entity.RpcResponseMessage;
  *
  * @author mffseal
  */
-public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponseMessage> {
+public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponseMessage<?>> {
     private static final Logger log = LoggerFactory.getLogger(NettyClientHandler.class);
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RpcResponseMessage msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, RpcResponseMessage msg) {
         try {
             log.info("客户端收到消息: {}", msg);
-            AttributeKey<RpcResponseMessage> key = AttributeKey.valueOf("rpcResponse");
+            AttributeKey<RpcResponseMessage<?>> key = AttributeKey.valueOf("rpcResponse" + msg.getSequenceId());
             ctx.channel().attr(key).set(msg);
             ctx.channel().close();
         } finally {
@@ -29,7 +29,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponseM
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("过程调用时发生错误:", cause);
         ctx.close();
     }
