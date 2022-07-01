@@ -1,5 +1,6 @@
 package top.mffseal.rpc.netty.client;
 
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
@@ -13,6 +14,7 @@ import top.mffseal.rpc.entity.RpcResponseMessage;
  *
  * @author mffseal
  */
+@ChannelHandler.Sharable
 public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponseMessage<?>> {
     private static final Logger log = LoggerFactory.getLogger(NettyClientHandler.class);
 

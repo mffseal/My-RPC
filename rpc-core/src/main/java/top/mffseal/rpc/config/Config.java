@@ -102,5 +102,28 @@ public class Config {
         return getNettyLogLevel("client.netty.loglevel");
     }
 
+    /**
+     * 配置Netty客户端失败重试次数。
+     *
+     * @return 重试次数
+     */
+    public static int getNettyClientRetryCount() {
+        String value = properties.getProperty("client.netty.retry");
+        if (value == null) {
+            return 1;
+        } else {
+            return Integer.parseInt(value);
+        }
+    }
+
+    public static int getNettyClientConnectTimeout() {
+        String value = properties.getProperty("client.netty.timeout");
+        if (value == null) {
+            return 5000;
+        } else {
+            return Integer.parseInt(value);
+        }
+    }
+
 
 }

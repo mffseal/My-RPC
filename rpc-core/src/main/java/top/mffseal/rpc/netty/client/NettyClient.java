@@ -1,63 +1,36 @@
 package top.mffseal.rpc.netty.client;
 
-import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LoggingHandler;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandler;
 import io.netty.util.AttributeKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RpcClient;
-import top.mffseal.rpc.codec.CommonCodec;
-import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.util.RpcMessageChecker;
 
+import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * @author mffseal
  */
+@ChannelHandler.Sharable
 public class NettyClient implements RpcClient {
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
-    private final String host;
-    private final int port;
-    private static final Bootstrap bootstrap;
+    private static InetSocketAddress serverAddress;
 
     public NettyClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
-
-    // 配置客户端信息
-    static {
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        LoggingHandler LOGGING_HANDLER = new LoggingHandler(Config.getNettyClientLogLevel());
-        CommonCodec COMMON_CODEC = new CommonCodec();
-        NettyClientHandler RESPONSE_HANDLER = new NettyClientHandler();
-
-        bootstrap = new Bootstrap();
-        bootstrap.group(workerGroup)
-                .channel(NioSocketChannel.class)
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(LOGGING_HANDLER);
-                        ch.pipeline().addLast(COMMON_CODEC);
-                        ch.pipeline().addLast(RESPONSE_HANDLER);
-                    }
-                });
+        serverAddress = new InetSocketAddress(host, port);
     }
 
     @Override
     public Object sendRequest(RpcRequestMessage rpcRequestMessage) {
+        AtomicReference<Object> result = new AtomicReference<>(null);
         try {
-            ChannelFuture future = bootstrap.connect(host, port).sync();
-            Channel channel = future.channel();
-            log.info("客户端连接到服务器 {}:{}", host, port);
-            if (channel != null) {
+            Channel channel = ChannelProvider.get(serverAddress);
+            if (channel.isActive()) {
                 // 向服务端发送请求，并通过回调获取服务端响应结果
                 channel.writeAndFlush(rpcRequestMessage).addListener(future1 -> {
                     if (future1.isSuccess()) {
@@ -72,11 +45,14 @@ public class NettyClient implements RpcClient {
                 AttributeKey<RpcResponseMessage<?>> key = AttributeKey.valueOf("rpcResponse" + rpcRequestMessage.getSequenceId());
                 RpcResponseMessage<?> rpcResponseMessage = channel.attr(key).get();
                 RpcMessageChecker.check(rpcRequestMessage, rpcResponseMessage);
-                return rpcResponseMessage.getData();
+                result.set(rpcResponseMessage.getData());
+            } else {
+                // 结束客户端主线程
+                System.exit(0);
             }
         } catch (InterruptedException e) {
-            log.error("服务器连接失败: ", e);
+            log.error("发送消息失败: ", e);
         }
-        return null;
+        return result.get();
     }
 }
