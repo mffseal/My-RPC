@@ -15,10 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author mffseal
  */
 public class ProtostuffSerializer implements Serializer {
-    private LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
-    private Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
+    private final LinkedBuffer buffer = LinkedBuffer.allocate(LinkedBuffer.DEFAULT_BUFFER_SIZE);
+    private final Map<Class<?>, Schema<?>> schemaCache = new ConcurrentHashMap<>();
 
     @Override
+    @SuppressWarnings("unchecked")
     public byte[] serialize(Object obj) {
         Class clazz = obj.getClass();
         Schema schema = getSchema(clazz);
@@ -32,6 +33,7 @@ public class ProtostuffSerializer implements Serializer {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object deserialize(byte[] bytes, Class<?> clazz) {
         Schema schema = getSchema(clazz);
         Object obj = schema.newMessage();
@@ -39,6 +41,7 @@ public class ProtostuffSerializer implements Serializer {
         return obj;
     }
 
+    @SuppressWarnings("unchecked")
     private Schema getSchema(Class clazz) {
         Schema schema = schemaCache.get(clazz);
         if (Objects.isNull(schema)) {
