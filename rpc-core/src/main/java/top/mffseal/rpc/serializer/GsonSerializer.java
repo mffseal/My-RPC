@@ -10,7 +10,7 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 使用Gson实现的序列化器。
+ * 基于Gson的序列化。
  *
  * @author mffseal
  */

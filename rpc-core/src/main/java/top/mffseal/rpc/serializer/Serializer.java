@@ -127,6 +127,19 @@ public interface Serializer {
                 return gson.deserialize(bytes, clazz);
             }
         },
+        Protostuff {
+            private final Serializer protostuff = new ProtostuffSerializer();
+
+            @Override
+            public byte[] serialize(Object obj) {
+                return protostuff.serialize(obj);
+            }
+
+            @Override
+            public Object deserialize(byte[] bytes, Class<?> clazz) {
+                return protostuff.deserialize(bytes, clazz);
+            }
+        }
 
     }
 

@@ -7,6 +7,8 @@ import top.mffseal.rpc.exception.SerializeException;
 import java.io.*;
 
 /**
+ * 基于Java原生实现的序列化。
+ *
  * @author mffseal
  */
 public class NativeSerializer implements Serializer {

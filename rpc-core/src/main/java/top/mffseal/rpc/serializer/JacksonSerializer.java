@@ -10,7 +10,7 @@ import top.mffseal.rpc.exception.SerializeException;
 import java.io.IOException;
 
 /**
- * 使用Jackson实现的序列化器。
+ * 基于Jackson的序列化器。
  *
  * @author mffseal
  */

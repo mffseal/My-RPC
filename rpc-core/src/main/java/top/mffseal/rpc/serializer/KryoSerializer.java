@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * Kryo序列化实现。
+ * 基于Kryo的序列化。
  *
  * @author mffseal
  */
