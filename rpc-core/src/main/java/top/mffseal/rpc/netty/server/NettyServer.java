@@ -13,7 +13,7 @@ import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RpcServer;
-import top.mffseal.rpc.codec.CommonCodec;
+import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.Config;
 
@@ -27,7 +27,7 @@ public class NettyServer implements RpcServer {
     public void start() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        CommonCodec COMMON_CODEC = new CommonCodec();
+        MessageCodec COMMON_CODEC = new MessageCodec();
         NettyServerHandler REQUEST_HANDLER = new NettyServerHandler();
         LoggingHandler LOGGING_HANDLER = new LoggingHandler(Config.getNettyServerLogLevel());
         try {

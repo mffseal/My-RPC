@@ -8,7 +8,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.codec.CommonCodec;
+import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.enumeration.RpcError;
@@ -28,7 +28,7 @@ public class ChannelProvider {
     private static EventLoopGroup eventExecutors;
     private static Bootstrap bootstrap;
     private static LoggingHandler loggingHandler;
-    private static CommonCodec commonCodec;
+    private static MessageCodec messageCodec;
     private static NettyClientHandler nettyClientHandler;
     private static Channel channel;
 
@@ -121,7 +121,7 @@ public class ChannelProvider {
                     protected void initChannel(SocketChannel ch) {
                         ch.pipeline().addLast(new ProtocolFrameDecoder());
                         ch.pipeline().addLast(loggingHandler);
-                        ch.pipeline().addLast(commonCodec);
+                        ch.pipeline().addLast(messageCodec);
                         ch.pipeline().addLast(nettyClientHandler);
                     }
                 });
@@ -136,8 +136,8 @@ public class ChannelProvider {
             eventExecutors = new NioEventLoopGroup();
         if (loggingHandler == null)
             loggingHandler = new LoggingHandler(Config.getNettyClientLogLevel());
-        if (commonCodec == null)
-            commonCodec = new CommonCodec();
+        if (messageCodec == null)
+            messageCodec = new MessageCodec();
         if (nettyClientHandler == null)
             nettyClientHandler = new NettyClientHandler();
     }

@@ -32,12 +32,12 @@ import java.util.List;
  * @author mffseal
  */
 @ChannelHandler.Sharable
-public class CommonCodec extends MessageToMessageCodec<ByteBuf, Message> {
-    private static final Logger log = LoggerFactory.getLogger(CommonCodec.class);
+public class MessageCodec extends MessageToMessageCodec<ByteBuf, Message> {
+    private static final Logger log = LoggerFactory.getLogger(MessageCodec.class);
     private static final int MAGIC_NUMBER = 0xCAFEBABE;
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> outList) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> outList) {
         ByteBuf out = ctx.alloc().buffer();
         out.writeInt(MAGIC_NUMBER);  // 魔数
         out.writeInt(msg.getMessageType());  // 消息类型
@@ -49,7 +49,7 @@ public class CommonCodec extends MessageToMessageCodec<ByteBuf, Message> {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
         // 魔数
         int magic = in.readInt();
         if (magic != MAGIC_NUMBER) {
