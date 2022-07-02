@@ -18,6 +18,7 @@ import java.util.List;
  * 自定义协议编解码器
  *
  * <table style="border:1px solid gray;border-collapse:collapse;">
+ *     <caption>自定义协议格式</caption>
  *     <tr>
  *         <td style="border:1px solid gray;text-align:center"><p>Magic Number</p> <p>4 bytes</p></td>
  *         <td style="border:1px solid gray;text-align:center"><p>Package Type</p> <p>4 bytes</p></td>

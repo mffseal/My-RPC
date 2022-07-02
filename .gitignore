@@ -4,3 +4,9 @@
 /rpc-core/target/
 /test-client/target/
 /test-server/target/
+
+# File-based project format:
+*.iws
+*.iml
+*.ipr
+
