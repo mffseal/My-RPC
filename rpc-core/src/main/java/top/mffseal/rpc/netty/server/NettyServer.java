@@ -16,12 +16,25 @@ import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.provider.ServiceProvider;
+import top.mffseal.rpc.provider.ServiceProviderImpl;
+import top.mffseal.rpc.registry.NacosServiceRegistry;
+import top.mffseal.rpc.registry.ServiceRegistry;
+
+import java.net.InetSocketAddress;
 
 /**
  * @author mffseal
  */
 public class NettyServer implements RpcServer {
     private static final Logger log = LoggerFactory.getLogger(NettyServer.class);
+    private final ServiceProvider serviceProvider;
+    private final ServiceRegistry serviceRegistry;
+
+    public NettyServer() {
+        serviceRegistry = new NacosServiceRegistry();
+        serviceProvider = new ServiceProviderImpl();
+    }
 
     @Override
     public void start() {
@@ -62,5 +75,11 @@ public class NettyServer implements RpcServer {
         }
 
 
+    }
+
+    @Override
+    public <T> void publishService(Object service, Class<T> serviceClass) {
+        serviceProvider.addServiceProvider(service);
+        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(Config.getServerHost(), Config.getServerPort()));
     }
 }

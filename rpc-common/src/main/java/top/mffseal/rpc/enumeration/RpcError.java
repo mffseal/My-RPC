@@ -21,7 +21,9 @@ public enum RpcError {
     UNKNOWN_PACKAGE_TYPE("未识别的数据包类型"),
     UNKNOWN_PACKAGE_LENGTH("未识别的数据包长度"),
     INCOMPLETE_DATA("不完整的数据包内容"),
-    RESPONSE_NOT_MATCH("请求和响应的序列号不匹配");
+    RESPONSE_NOT_MATCH("请求和响应的序列号不匹配"),
+    FAILED_TO_CONNECT_TO_DYNAMIC_NAMING_CONFIGURATION_SERVER("连接服务配置平台失败"),
+    REGISTER_SERVICE_FAILURE("注册服务失败");
 
 
     private final String message;

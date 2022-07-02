@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RpcClient;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
+import top.mffseal.rpc.registry.NacosServiceRegistry;
+import top.mffseal.rpc.registry.ServiceRegistry;
 import top.mffseal.rpc.util.RpcMessageChecker;
 
 import java.net.InetSocketAddress;
@@ -19,17 +21,19 @@ import java.util.concurrent.atomic.AtomicReference;
 @ChannelHandler.Sharable
 public class NettyClient implements RpcClient {
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
-    private static InetSocketAddress serverAddress;
+    private final ServiceRegistry serviceRegistry;
 
-    public NettyClient(String host, int port) {
-        serverAddress = new InetSocketAddress(host, port);
+    public NettyClient() {
+        serviceRegistry = new NacosServiceRegistry();
     }
 
     @Override
     public Object sendRequest(RpcRequestMessage rpcRequestMessage) {
+        // 查询服务提供者地址
+        InetSocketAddress inetSocketAddress = serviceRegistry.lookupService(rpcRequestMessage.getInterfaceName());
         AtomicReference<Object> result = new AtomicReference<>(null);
         try {
-            Channel channel = ChannelProvider.get(serverAddress);
+            Channel channel = ChannelProvider.get(inetSocketAddress);
             if (channel.isActive()) {
                 // 向服务端发送请求，并通过回调获取服务端响应结果
                 channel.writeAndFlush(rpcRequestMessage).addListener(future1 -> {

@@ -1,5 +1,7 @@
 package top.mffseal.rpc.registry;
 
+import java.net.InetSocketAddress;
+
 /**
  * 服务注册表接口，用于保存本地服务的信息，
  * 同时提供根据服务名返回服务实体的方法。
@@ -8,18 +10,18 @@ package top.mffseal.rpc.registry;
  */
 public interface ServiceRegistry {
     /**
-     * 将服务注册进注册表中。
+     * 将服务注册到远程服务管理平台。
      *
-     * @param service 被注册的服务
-     * @param <T>     服务实体类
+     * @param serviceName       要注册的服务名
+     * @param inetSocketAddress 提供该服务的服务端地址
      */
-    <T> void register(T service);
+    void register(String serviceName, InetSocketAddress inetSocketAddress);
 
     /**
-     * 根据服务名称获取服务实体。
+     * 根据服务名向服务提供者。
      *
      * @param serviceName 服务名
-     * @return 服务实体
+     * @return 提供目标服务的服务端地址
      */
-    Object getService(String serviceName);
+    InetSocketAddress lookupService(String serviceName);
 }

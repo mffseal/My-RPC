@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.enumeration.ResponseCode;
+import top.mffseal.rpc.provider.ServiceProvider;
+import top.mffseal.rpc.provider.ServiceProviderImpl;
 import top.mffseal.rpc.socket.server.RequestHandlerThread;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,15 +20,21 @@ import java.lang.reflect.Method;
 public class RequestHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandlerThread.class);
+    private static final ServiceProvider serviceProvider;
+
+    static {
+        serviceProvider = new ServiceProviderImpl();
+    }
 
     /**
      * 在service上调用rpcRequest中指定的方法，并返回包装成RpcResponseMessage的结果。
      *
      * @param rpcRequestMessage 客户端调用请求
-     * @param service           服务对象
      * @return 调用目标方法所返回的原始类型结果
      */
-    public Object handle(RpcRequestMessage rpcRequestMessage, Object service) {
+    public Object handle(RpcRequestMessage rpcRequestMessage) {
+        String interfaceName = rpcRequestMessage.getInterfaceName();  // 获取接口名
+        Object service = serviceProvider.getServiceProvider(interfaceName);  // 从本地放方法表找到服务实现
         Object result = null;
         try {
             result = invokeTargetMethod(rpcRequestMessage, service);

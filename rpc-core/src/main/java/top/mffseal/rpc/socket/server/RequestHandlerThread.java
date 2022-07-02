@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RequestHandler;
 import top.mffseal.rpc.entity.RpcRequestMessage;
-import top.mffseal.rpc.registry.ServiceRegistry;
 import top.mffseal.rpc.socket.util.ObjectReader;
 import top.mffseal.rpc.socket.util.ObjectWriter;
 
@@ -14,7 +13,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * 处理RpcRequest的工作线程，流程：
+ * 处理服务调用请求的工作线程，不负责直接调用服务实现，将结果包装成rpcResponse返回，流程：
  * 解析请求；
  * 调用rpc处理器；
  * 包装response；
@@ -27,11 +26,9 @@ public class RequestHandlerThread implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandlerThread.class);
     private final Socket socket;
     private final RequestHandler requestHandler;
-    private final ServiceRegistry serviceRegistry;
 
-    public RequestHandlerThread(Socket socket, RequestHandler requestHandler, ServiceRegistry serviceRegistry) {
+    public RequestHandlerThread(Socket socket, RequestHandler requestHandler) {
         this.socket = socket;
-        this.serviceRegistry = serviceRegistry;
         this.requestHandler = requestHandler;
     }
 
@@ -45,8 +42,8 @@ public class RequestHandlerThread implements Runnable {
             RpcRequestMessage rpcRequestMessage = (RpcRequestMessage) ObjectReader.readObject(inputStream);
             String interfaceName = rpcRequestMessage.getInterfaceName();
             logger.info("需要查找的接口名: {}", interfaceName);
-            Object service = serviceRegistry.getService(interfaceName);
-            Object rpcResponse = requestHandler.handle(rpcRequestMessage, service);
+            // 间接调用服务实现
+            Object rpcResponse = requestHandler.handle(rpcRequestMessage);
             ObjectWriter.writeObject(outputStream, rpcResponse);
         } catch (IOException e) {
             logger.error("调用或发送时有错误发生: ", e);

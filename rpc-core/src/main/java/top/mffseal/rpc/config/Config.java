@@ -116,10 +116,43 @@ public class Config {
         }
     }
 
+    /**
+     * 配置Netty客户端重连间隔事件。
+     *
+     * @return 间隔时间
+     */
     public static int getNettyClientConnectTimeout() {
         String value = properties.getProperty("client.netty.timeout");
         if (value == null) {
             return 5000;
+        } else {
+            return Integer.parseInt(value);
+        }
+    }
+
+    /**
+     * 配置服务管理平台地址
+     *
+     * @return 地址
+     */
+    public static String getDynamicNamingConfigurationServerHost() {
+        String value = properties.getProperty("dynamicNamingConfigurationServer.host");
+        if (value == null) {
+            return "localhost";
+        } else {
+            return value;
+        }
+    }
+
+    /**
+     * 配置服务管理平台端口。
+     *
+     * @return 端口
+     */
+    public static int getDynamicNamingConfigurationServerPort() {
+        String value = properties.getProperty("dynamicNamingConfigurationServer.port");
+        if (value == null) {
+            return 8848;
         } else {
             return Integer.parseInt(value);
         }

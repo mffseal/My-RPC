@@ -5,10 +5,14 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.RequestHandler;
 import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.provider.ServiceProvider;
+import top.mffseal.rpc.provider.ServiceProviderImpl;
+import top.mffseal.rpc.registry.NacosServiceRegistry;
 import top.mffseal.rpc.registry.ServiceRegistry;
 import top.mffseal.rpc.util.ThreadPoolFactory;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -26,15 +30,16 @@ public class SocketServer implements RpcServer {
 
 
     private final ExecutorService threadPool;
+    private final ServiceProvider serviceProvider;
     private final ServiceRegistry serviceRegistry;
     private final RequestHandler requestHandler = new RequestHandler();
 
     /**
      * 初始化工作线程池。
      */
-    public SocketServer(ServiceRegistry serviceRegistry) {
-        this.serviceRegistry = serviceRegistry;
-
+    public SocketServer() {
+        serviceRegistry = new NacosServiceRegistry();
+        serviceProvider = new ServiceProviderImpl();
         threadPool = ThreadPoolFactory.createDefaultThreadPool("SocketRpcServer");
     }
 
@@ -49,12 +54,18 @@ public class SocketServer implements RpcServer {
             // 每收到一个请求，就创建一个工作线程
             while ((socket = serverSocket.accept()) != null) {
                 logger.info("客户端连接! 地址: " + socket.getInetAddress() + ":" + socket.getPort());
-                threadPool.execute(new RequestHandlerThread(socket, requestHandler, serviceRegistry));
+                threadPool.execute(new RequestHandlerThread(socket, requestHandler));
             }
             threadPool.shutdown();
         } catch (IOException e) {
             logger.error("连接时发生错误: ", e);
         }
+    }
+
+    @Override
+    public <T> void publishService(Object service, Class<T> serviceClass) {
+        serviceProvider.addServiceProvider(service);
+        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(Config.getServerHost(), Config.getServerPort()));
     }
 
 }

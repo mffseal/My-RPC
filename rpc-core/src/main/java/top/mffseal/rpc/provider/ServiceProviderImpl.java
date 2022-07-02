@@ -1,4 +1,4 @@
-package top.mffseal.rpc.registry;
+package top.mffseal.rpc.provider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,13 +10,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 注册器的默认实现，采用
+ * 服务提供者默认实现。
  *
  * @author mffseal
  */
-public class DefaultServiceRegistry implements ServiceRegistry {
+public class ServiceProviderImpl implements ServiceProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultServiceRegistry.class);
+    private static final Logger logger = LoggerFactory.getLogger(ServiceProviderImpl.class);
 
     /**
      * 记录提供服务的对象所实现的接口（可能有多个）与提供服务对象的对应关系：
@@ -32,7 +32,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
     private static final Set<String> registeredService = ConcurrentHashMap.newKeySet();
 
     /**
-     * 将传入的对象注册到注册表。
+     * 将传入的对象注册到本地服务注册表。
      * 所注册的方法必须至少实现一个接口；
      * 方法实现多个接口时会记录多个接口--服务对象的记录；
      * 方法不会被重复注册。
@@ -41,7 +41,7 @@ public class DefaultServiceRegistry implements ServiceRegistry {
      * @param <T>     服务实体类
      */
     @Override
-    public synchronized <T> void register(T service) {
+    public <T> void addServiceProvider(T service) {
         // 记录服务
         String serviceName = service.getClass().getCanonicalName();  // 获取服务的全路径名
         if (registeredService.contains(serviceName)) return;
@@ -62,13 +62,13 @@ public class DefaultServiceRegistry implements ServiceRegistry {
     }
 
     /**
-     * 通过接口名查找实现对象。
+     * 通过接口名查找本地实现对象。
      *
      * @param serviceName 服务名
      * @return 实现对象
      */
     @Override
-    public synchronized Object getService(String serviceName) {
+    public Object getServiceProvider(String serviceName) {
         Object service = serviceMap.get(serviceName);
         if (service == null) {
             throw new RpcException(RpcError.SERVICE_NOT_FOUND, serviceName);

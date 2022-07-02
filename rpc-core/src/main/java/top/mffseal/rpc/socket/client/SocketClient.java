@@ -8,6 +8,8 @@ import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.enumeration.ResponseCode;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
+import top.mffseal.rpc.registry.NacosServiceRegistry;
+import top.mffseal.rpc.registry.ServiceRegistry;
 import top.mffseal.rpc.socket.util.ObjectReader;
 import top.mffseal.rpc.socket.util.ObjectWriter;
 import top.mffseal.rpc.util.RpcMessageChecker;
@@ -15,11 +17,13 @@ import top.mffseal.rpc.util.RpcMessageChecker;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**
  * rpc客户端，基于原生Socket的BIO网络通讯，负责：
- * 向服务端发起rpc请求，并接收服务器端发回的网络数据；
+ * 通过服务管理平台查询服务提供者，
+ * 向服务提供者发起rpc请求，并接收服务器端发回的网络数据；
  * 解析收到的数据，转换成成RpcResponse。
  *
  * @author mffseal
@@ -27,23 +31,24 @@ import java.net.Socket;
 public class SocketClient implements RpcClient {
     private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
 
-    private final String host;
-    private final int port;
+    private final ServiceRegistry serviceRegistry;
 
-    public SocketClient(String host, int port) {
-        this.host = host;
-        this.port = port;
+    public SocketClient() {
+        serviceRegistry = new NacosServiceRegistry();
     }
 
     /**
-     * 向服务者发送rpc请求。
+     * 向服务管理平台查询服务提供者，并向服务者发送rpc请求。
      *
      * @param rpcRequestMessage 请求对象
      * @return 响应对象
      */
     public Object sendRequest(RpcRequestMessage rpcRequestMessage) {
+        // 查询服务提供者地址
+        InetSocketAddress inetSocketAddress = serviceRegistry.lookupService(rpcRequestMessage.getInterfaceName());
         // 使用自带Socket通讯
-        try (Socket socket = new Socket(host, port)) {
+        try (Socket socket = new Socket()) {
+            socket.connect(inetSocketAddress);  // 与服务提供者建立连接
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
             // 发送请求
