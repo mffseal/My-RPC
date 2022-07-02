@@ -1,4 +1,4 @@
-package top.mffseal.rpc.netty.server;
+package top.mffseal.rpc.transport.netty.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -12,7 +12,6 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.Config;
@@ -20,6 +19,7 @@ import top.mffseal.rpc.provider.ServiceProvider;
 import top.mffseal.rpc.provider.ServiceProviderImpl;
 import top.mffseal.rpc.registry.NacosServiceRegistry;
 import top.mffseal.rpc.registry.ServiceRegistry;
+import top.mffseal.rpc.transport.RpcServer;
 
 import java.net.InetSocketAddress;
 

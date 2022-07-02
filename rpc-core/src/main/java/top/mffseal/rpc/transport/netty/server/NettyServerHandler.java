@@ -1,11 +1,11 @@
-package top.mffseal.rpc.netty.server;
+package top.mffseal.rpc.transport.netty.server;
 
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.RequestHandler;
 import top.mffseal.rpc.entity.RpcRequestMessage;
+import top.mffseal.rpc.handler.RequestHandler;
 import top.mffseal.rpc.util.ThreadPoolFactory;
 
 import java.util.concurrent.ExecutorService;

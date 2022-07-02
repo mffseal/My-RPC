@@ -1,8 +1,8 @@
 package top.mffseal.test;
 
-import top.mffseal.rpc.RpcServer;
 import top.mffseal.rpc.api.HelloService;
-import top.mffseal.rpc.netty.server.NettyServer;
+import top.mffseal.rpc.transport.RpcServer;
+import top.mffseal.rpc.transport.netty.server.NettyServer;
 
 /**
  * @author mffseal

@@ -1,10 +1,10 @@
 package top.mffseal.test;
 
-import top.mffseal.rpc.RpcClient;
-import top.mffseal.rpc.RpcClientProxy;
 import top.mffseal.rpc.api.HelloObject;
 import top.mffseal.rpc.api.HelloService;
-import top.mffseal.rpc.netty.client.NettyClient;
+import top.mffseal.rpc.transport.RpcClient;
+import top.mffseal.rpc.transport.RpcClientProxy;
+import top.mffseal.rpc.transport.netty.client.NettyClient;
 
 /**
  * @author mffseal

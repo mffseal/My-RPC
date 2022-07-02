@@ -1,4 +1,4 @@
-package top.mffseal.rpc.netty.client;
+package top.mffseal.rpc.transport.netty.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;

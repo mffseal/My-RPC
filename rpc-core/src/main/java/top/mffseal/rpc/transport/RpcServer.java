@@ -1,4 +1,4 @@
-package top.mffseal.rpc;
+package top.mffseal.rpc.transport;
 
 /**
  * RPC服务端接口，负责启动网络服务并向服务管理平台注册服务实现。

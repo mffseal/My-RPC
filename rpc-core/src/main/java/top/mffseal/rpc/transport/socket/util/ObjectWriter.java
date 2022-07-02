@@ -1,4 +1,4 @@
-package top.mffseal.rpc.socket.util;
+package top.mffseal.rpc.transport.socket.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

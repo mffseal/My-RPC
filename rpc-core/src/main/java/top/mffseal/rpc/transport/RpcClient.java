@@ -1,4 +1,4 @@
-package top.mffseal.rpc;
+package top.mffseal.rpc.transport;
 
 import top.mffseal.rpc.entity.RpcRequestMessage;
 

@@ -1,4 +1,4 @@
-package top.mffseal.rpc;
+package top.mffseal.rpc.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +7,7 @@ import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.enumeration.ResponseCode;
 import top.mffseal.rpc.provider.ServiceProvider;
 import top.mffseal.rpc.provider.ServiceProviderImpl;
-import top.mffseal.rpc.socket.server.RequestHandlerThread;
+import top.mffseal.rpc.transport.socket.server.RequestHandlerThread;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
