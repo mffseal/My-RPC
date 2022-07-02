@@ -7,8 +7,8 @@ import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.enumeration.ResponseCode;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
-import top.mffseal.rpc.registry.NacosServiceRegistry;
-import top.mffseal.rpc.registry.ServiceRegistry;
+import top.mffseal.rpc.registry.NacosServiceDiscovery;
+import top.mffseal.rpc.registry.ServiceDiscovery;
 import top.mffseal.rpc.transport.RpcClient;
 import top.mffseal.rpc.transport.socket.util.ObjectReader;
 import top.mffseal.rpc.transport.socket.util.ObjectWriter;
@@ -31,10 +31,10 @@ import java.net.Socket;
 public class SocketClient implements RpcClient {
     private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
 
-    private final ServiceRegistry serviceRegistry;
+    private final ServiceDiscovery serviceDiscovery;
 
     public SocketClient() {
-        serviceRegistry = new NacosServiceRegistry();
+        serviceDiscovery = new NacosServiceDiscovery();
     }
 
     /**
@@ -45,7 +45,7 @@ public class SocketClient implements RpcClient {
      */
     public Object sendRequest(RpcRequestMessage rpcRequestMessage) {
         // 查询服务提供者地址
-        InetSocketAddress inetSocketAddress = serviceRegistry.lookupService(rpcRequestMessage.getInterfaceName());
+        InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequestMessage.getInterfaceName());
         // 使用自带Socket通讯
         try (Socket socket = new Socket()) {
             socket.connect(inetSocketAddress);  // 与服务提供者建立连接

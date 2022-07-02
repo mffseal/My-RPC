@@ -7,7 +7,7 @@ package top.mffseal.rpc.provider;
  */
 public interface ServiceProvider {
 
-    <T> void addServiceProvider(T service);
+    <T> void addServiceProvider(T service, Class<T> serverClass);
 
     Object getServiceProvider(String serviceName);
 }

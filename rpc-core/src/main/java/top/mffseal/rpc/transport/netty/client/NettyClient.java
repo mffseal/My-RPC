@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
-import top.mffseal.rpc.registry.NacosServiceRegistry;
-import top.mffseal.rpc.registry.ServiceRegistry;
+import top.mffseal.rpc.registry.NacosServiceDiscovery;
+import top.mffseal.rpc.registry.ServiceDiscovery;
 import top.mffseal.rpc.transport.RpcClient;
 import top.mffseal.rpc.util.RpcMessageChecker;
 
@@ -21,16 +21,16 @@ import java.util.concurrent.atomic.AtomicReference;
 @ChannelHandler.Sharable
 public class NettyClient implements RpcClient {
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
-    private final ServiceRegistry serviceRegistry;
+    private final ServiceDiscovery serviceDiscovery;
 
     public NettyClient() {
-        serviceRegistry = new NacosServiceRegistry();
+        serviceDiscovery = new NacosServiceDiscovery();
     }
 
     @Override
     public Object sendRequest(RpcRequestMessage rpcRequestMessage) {
         // 查询服务提供者地址
-        InetSocketAddress inetSocketAddress = serviceRegistry.lookupService(rpcRequestMessage.getInterfaceName());
+        InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequestMessage.getInterfaceName());
         AtomicReference<Object> result = new AtomicReference<>(null);
         try {
             Channel channel = ChannelProvider.get(inetSocketAddress);
@@ -38,7 +38,7 @@ public class NettyClient implements RpcClient {
                 // 向服务端发送请求，并通过回调获取服务端响应结果
                 channel.writeAndFlush(rpcRequestMessage).addListener(future1 -> {
                     if (future1.isSuccess()) {
-                        log.info("客户端发送消息成功: {}", rpcRequestMessage.toString());
+                        log.info("客户端发送消息成功: {}", rpcRequestMessage);
                     } else {
                         log.error("客户端发送消息失败: ", future1.cause());
                     }

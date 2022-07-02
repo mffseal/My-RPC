@@ -18,5 +18,5 @@ public interface RpcServer {
      * @param serviceClass 服务接口
      * @param <T>          服务类型
      */
-    <T> void publishService(Object service, Class<T> serviceClass);
+    <T> void publishService(T service, Class<T> serviceClass);
 }

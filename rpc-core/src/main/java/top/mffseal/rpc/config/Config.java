@@ -135,8 +135,8 @@ public class Config {
      *
      * @return 地址
      */
-    public static String getDynamicNamingConfigurationServerHost() {
-        String value = properties.getProperty("dynamicNamingConfigurationServer.host");
+    public static String getNamingServerHost() {
+        String value = properties.getProperty("namingServer.host");
         if (value == null) {
             return "localhost";
         } else {
@@ -149,8 +149,8 @@ public class Config {
      *
      * @return 端口
      */
-    public static int getDynamicNamingConfigurationServerPort() {
-        String value = properties.getProperty("dynamicNamingConfigurationServer.port");
+    public static int getNamingServerPort() {
+        String value = properties.getProperty("namingServer.port");
         if (value == null) {
             return 8848;
         } else {
