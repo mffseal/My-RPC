@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * @author mffseal
  */
-public class NacosServiceDiscovery implements ServiceDiscovery{
+public class NacosServiceDiscovery implements ServiceDiscovery {
     private static final Logger log = LoggerFactory.getLogger(NacosServiceDiscovery.class);
     private final NamingService namingService;
 

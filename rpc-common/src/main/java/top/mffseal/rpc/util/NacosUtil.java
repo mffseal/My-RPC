@@ -22,6 +22,7 @@ public class NacosUtil {
 
     /**
      * 获取连接到nacos服务器。
+     *
      * @param host Nacos服务器地址
      * @param port Nacos服务器端口
      * @return NamingService
@@ -39,8 +40,9 @@ public class NacosUtil {
 
     /**
      * 向Nacos注册服务。
-     * @param namingService Nacos服务器
-     * @param serviceName 要注册的服务名称
+     *
+     * @param namingService     Nacos服务器
+     * @param serviceName       要注册的服务名称
      * @param inetSocketAddress 服务提供者地址
      * @throws NacosException 注册异常
      */
@@ -50,8 +52,9 @@ public class NacosUtil {
 
     /**
      * 向Nacos查询服务。
+     *
      * @param namingService Nacos服务器
-     * @param serviceName 要查询的服务名称
+     * @param serviceName   要查询的服务名称
      * @return 服务提供商地址
      * @throws NacosException 查询异常
      */

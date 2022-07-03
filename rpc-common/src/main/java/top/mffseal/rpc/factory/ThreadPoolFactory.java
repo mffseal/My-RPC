@@ -1,4 +1,4 @@
-package top.mffseal.rpc.util;
+package top.mffseal.rpc.factory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 

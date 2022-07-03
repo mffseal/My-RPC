@@ -5,8 +5,8 @@ import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
+import top.mffseal.rpc.factory.ThreadPoolFactory;
 import top.mffseal.rpc.handler.RequestHandler;
-import top.mffseal.rpc.util.ThreadPoolFactory;
 
 import java.util.concurrent.ExecutorService;
 
@@ -23,6 +23,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequestMe
      */
     private static final ExecutorService threadPool;
     private static final String THREAD_NAME_PREFIX = "netty-server-handler";
+    /**
+     * Sharable的handler加上是static final修饰，所以requestHandler不用单例工厂就能线程安全的进行单例模式实例化。
+     */
     private static final RequestHandler requestHandler;
 
     // 初始化
