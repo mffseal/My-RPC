@@ -10,6 +10,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.codec.MessageCodec;
@@ -23,6 +24,7 @@ import top.mffseal.rpc.registry.ServiceRegistry;
 import top.mffseal.rpc.transport.RpcServer;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mffseal
@@ -57,6 +59,7 @@ public class NettyServer implements RpcServer {
                             ch.pipeline().addLast(new ProtocolFrameDecoder());
                             ch.pipeline().addLast(LOGGING_HANDLER);
                             ch.pipeline().addLast(COMMON_CODEC);  // 编解码handler
+                            ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
                             ch.pipeline().addLast(REQUEST_HANDLER);  // 请求处理handler
                         }
                     });

@@ -1,6 +1,8 @@
 package top.mffseal.rpc.transport.netty.server;
 
 import io.netty.channel.*;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequestMe
         // 将业务从netty线程解耦
         threadPool.execute(() -> {
             try {
+                if (msg.getHeartBeat()) {
+                    log.info("收到 {} 客户端的心跳包", ctx.channel().remoteAddress());
+                    return;
+                }
                 Object result = requestHandler.handle(msg);// 调用服务实现，返回的结果已经包装成RpcResponseMessage
                 ChannelFuture future = ctx.writeAndFlush(result);
                 future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);  // 操作失败或取消时关闭连接 todo 是否可以长连接?
@@ -47,5 +53,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequestMe
                 ReferenceCountUtil.release(msg);  // 引用计数-1 TODO: 2022/6/28 确实需要手动释放资源码
             }
         });
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        IdleStateEvent event = (IdleStateEvent) evt;
+        if (event.state() == IdleState.READER_IDLE) {
+            log.debug("5秒内未再收到 {} 客户端发送的消息，断开连接", ctx.channel().remoteAddress());
+            ctx.channel().close();
+        } else {
+            super.userEventTriggered(ctx, evt);
+        }
     }
 }

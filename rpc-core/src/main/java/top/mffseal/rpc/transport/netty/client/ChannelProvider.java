@@ -6,6 +6,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.codec.MessageCodec;
@@ -122,6 +123,8 @@ public class ChannelProvider {
                         ch.pipeline().addLast(new ProtocolFrameDecoder());
                         ch.pipeline().addLast(loggingHandler);
                         ch.pipeline().addLast(messageCodec);
+                        // 心跳超时3秒
+                        ch.pipeline().addLast(new IdleStateHandler(0, 3, 0, TimeUnit.SECONDS));
                         ch.pipeline().addLast(nettyClientHandler);
                     }
                 });

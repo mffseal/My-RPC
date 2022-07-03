@@ -3,10 +3,13 @@ package top.mffseal.rpc.transport.netty.client;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 
 /**
@@ -34,5 +37,18 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponseM
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("过程调用时发生错误:", cause);
         ctx.close();
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        IdleStateEvent event = (IdleStateEvent) evt;
+        if (event.state() == IdleState.WRITER_IDLE) {
+            log.info("发送心跳包: {}", ctx.channel().remoteAddress());
+            RpcRequestMessage request = new RpcRequestMessage();
+            request.setHeartBeat(true);
+            ctx.writeAndFlush(request);
+        } else {
+            super.userEventTriggered(ctx, evt);
+        }
     }
 }

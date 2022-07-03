@@ -1,9 +1,6 @@
 package top.mffseal.rpc.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * 消费者向服务者发送的请求对象
@@ -12,6 +9,7 @@ import lombok.ToString;
  * @author mffseal
  */
 @Getter
+@Setter
 @ToString(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,13 +31,18 @@ public class RpcRequestMessage extends Message {
      * 调用参数类型列表
      */
     private Class<?>[] paramTypes;
+    /**
+     * 心跳包标记位
+     */
+    private Boolean heartBeat;
 
-    public RpcRequestMessage(String sequenceId, String interfaceName, String methodName, Object[] parameters, Class<?>[] paramTypes) {
+    public RpcRequestMessage(String sequenceId, String interfaceName, String methodName, Object[] parameters, Class<?>[] paramTypes, Boolean heartBeat) {
         super(sequenceId);
         this.interfaceName = interfaceName;
         this.methodName = methodName;
         this.parameters = parameters;
         this.paramTypes = paramTypes;
+        this.heartBeat = heartBeat;
     }
 
     @Override
