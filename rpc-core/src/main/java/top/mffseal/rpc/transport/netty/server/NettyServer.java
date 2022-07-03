@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
-import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.hook.ShutdownHook;
 import top.mffseal.rpc.provider.ServiceProvider;
 import top.mffseal.rpc.provider.ServiceProviderImpl;
@@ -43,9 +43,9 @@ public class NettyServer implements RpcServer {
     public void start() {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
-        MessageCodec COMMON_CODEC = new MessageCodec();
+        MessageCodec COMMON_CODEC = new MessageCodec(RpcServerConfig.getSerializerLibrary());
         NettyServerHandler REQUEST_HANDLER = new NettyServerHandler();
-        LoggingHandler LOGGING_HANDLER = new LoggingHandler(Config.getNettyServerLogLevel());
+        LoggingHandler LOGGING_HANDLER = new LoggingHandler(RpcServerConfig.getNettyLogLevel());
         try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
@@ -64,7 +64,7 @@ public class NettyServer implements RpcServer {
                         }
                     });
             // 同步等待服务器绑定端口
-            ChannelFuture future = serverBootstrap.bind(Config.getServerHost(), Config.getServerPort()).sync();
+            ChannelFuture future = serverBootstrap.bind(RpcServerConfig.getHost(), RpcServerConfig.getPort()).sync();
 
             // 关闭后注销服务
             ShutdownHook.getShutdownHock().addClearAllHock();
@@ -88,6 +88,6 @@ public class NettyServer implements RpcServer {
     @Override
     public <T> void publishService(T service, Class<T> serviceClass) {
         serviceProvider.addServiceProvider(service, serviceClass);
-        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(Config.getServerHost(), Config.getServerPort()));
+        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(RpcServerConfig.getHost(), RpcServerConfig.getPort()));
     }
 }

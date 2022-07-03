@@ -2,7 +2,7 @@ package top.mffseal.rpc.transport.socket.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.factory.ThreadPoolFactory;
 import top.mffseal.rpc.handler.RequestHandler;
 import top.mffseal.rpc.hook.ShutdownHook;
@@ -51,7 +51,7 @@ public class SocketServer implements RpcServer {
         // 关闭后注销服务
         ShutdownHook.getShutdownHock().addClearAllHock();
 
-        try (ServerSocket serverSocket = new ServerSocket(Config.getServerPort())) {
+        try (ServerSocket serverSocket = new ServerSocket(RpcServerConfig.getPort())) {
             logger.info("服务器启动中...");
             Socket socket;
             logger.info("{}", serverSocket);
@@ -69,7 +69,7 @@ public class SocketServer implements RpcServer {
     @Override
     public <T> void publishService(T service, Class<T> serviceClass) {
         serviceProvider.addServiceProvider(service, serviceClass);
-        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(Config.getServerHost(), Config.getServerPort()));
+        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(RpcServerConfig.getHost(), RpcServerConfig.getPort()));
     }
 
 }

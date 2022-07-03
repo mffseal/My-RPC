@@ -4,7 +4,8 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.config.RpcClientConfig;
+import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.util.NacosUtil;
 
 import java.net.InetSocketAddress;
@@ -19,7 +20,7 @@ public class NacosServiceDiscovery implements ServiceDiscovery {
     @Override
     public InetSocketAddress lookupService(String serviceName) {
         try {
-            NacosUtil.connectToNacosNamingService(Config.getNamingServerHost(), Config.getNamingServerPort());
+            NacosUtil.connectToNacosNamingService(RpcClientConfig.getNamingServerHost(), RpcClientConfig.getNamingServerPort());
             // 获取到某个服务的所有提供者列表
             List<Instance> instances = NacosUtil.getAllInstances(serviceName);
             // 目前均采用找到的第一个服务提供者

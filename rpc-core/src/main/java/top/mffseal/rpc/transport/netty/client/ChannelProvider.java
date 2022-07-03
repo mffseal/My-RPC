@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
-import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.config.RpcClientConfig;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
 
@@ -36,7 +36,7 @@ public class ChannelProvider {
     /**
      * 最大重试次数
      */
-    private static final int MAX_RETRY_COUNT = Config.getNettyClientRetryCount();
+    private static final int MAX_RETRY_COUNT = RpcClientConfig.getNettyRetryCount();
 
     /**
      * 向服务端建立连接，带重传功能。
@@ -114,7 +114,7 @@ public class ChannelProvider {
         bootstrap.group(eventExecutors)
                 .channel(NioSocketChannel.class)
                 //连接的超时时间，超过这个时间还是建立不上的话则代表连接失败
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, Config.getNettyClientConnectTimeout())
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, RpcClientConfig.getNettyConnectTimeout())
                 //是否开启 TCP 底层心跳机制
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -138,9 +138,9 @@ public class ChannelProvider {
         if (eventExecutors == null)
             eventExecutors = new NioEventLoopGroup();
         if (loggingHandler == null)
-            loggingHandler = new LoggingHandler(Config.getNettyClientLogLevel());
+            loggingHandler = new LoggingHandler(RpcClientConfig.getNettyLogLevel());
         if (messageCodec == null)
-            messageCodec = new MessageCodec();
+            messageCodec = new MessageCodec(RpcClientConfig.getSerializerLibrary());
         if (nettyClientHandler == null)
             nettyClientHandler = new NettyClientHandler();
     }

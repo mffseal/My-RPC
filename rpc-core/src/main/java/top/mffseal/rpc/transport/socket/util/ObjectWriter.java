@@ -2,7 +2,7 @@ package top.mffseal.rpc.transport.socket.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.entity.Message;
 
 import java.io.IOException;
@@ -22,8 +22,8 @@ public class ObjectWriter {
         out.write(intToBytes(MAGIC_NUMBER));  // 魔数
         log.info("{}", ((Message) msg).getMessageType());
         out.write(intToBytes(((Message) msg).getMessageType()));  // 消息类型
-        out.write(intToBytes(Config.getSerializerLibrary().ordinal()));  // 序列化类型
-        byte[] bytes = Config.getSerializerLibrary().serialize(msg);  // 通过配置类获取序列化架构
+        out.write(intToBytes(RpcServerConfig.getSerializerLibrary().ordinal()));  // 序列化类型
+        byte[] bytes = RpcServerConfig.getSerializerLibrary().serialize(msg);  // 通过配置类获取序列化架构
         out.write(intToBytes(bytes.length));  // 序列化长度
         out.write(bytes);  // 序列化内容
         out.flush();

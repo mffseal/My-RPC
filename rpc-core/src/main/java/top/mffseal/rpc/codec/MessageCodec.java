@@ -1,12 +1,10 @@
 package top.mffseal.rpc.codec;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.entity.Message;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
@@ -32,18 +30,22 @@ import java.util.List;
  *
  * @author mffseal
  */
-@ChannelHandler.Sharable
 public class MessageCodec extends MessageToMessageCodec<ByteBuf, Message> {
     private static final Logger log = LoggerFactory.getLogger(MessageCodec.class);
     private static final int MAGIC_NUMBER = 0xCAFEBABE;
+    private final Serializer.Library serializer;
+
+    public MessageCodec(Serializer.Library serializer) {
+        this.serializer = serializer;
+    }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, List<Object> outList) {
         ByteBuf out = ctx.alloc().buffer();
         out.writeInt(MAGIC_NUMBER);  // 魔数
         out.writeInt(msg.getMessageType());  // 消息类型
-        out.writeInt(Config.getSerializerLibrary().ordinal());  // 序列化类型
-        byte[] bytes = Config.getSerializerLibrary().serialize(msg);  // 通过配置类获取序列化架构
+        out.writeInt(serializer.ordinal());  // 序列化类型
+        byte[] bytes = serializer.serialize(msg);  // 通过配置类获取序列化架构
         out.writeInt(bytes.length);  // 序列化长度
         out.writeBytes(bytes);  // 序列化内容
         outList.add(out);

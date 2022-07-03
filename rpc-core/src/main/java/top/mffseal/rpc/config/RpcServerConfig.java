@@ -8,15 +8,15 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * 配置类，用于配置序列化实现和基于配置文件的服务注册。
+ * rpc服务端配置类。
  *
  * @author mffseal
  */
-public class Config {
+public class RpcServerConfig {
     static Properties properties;
 
     static {
-        try (InputStream in = Config.class.getResourceAsStream("/application.properties")) {
+        try (InputStream in = RpcServerConfig.class.getResourceAsStream("/rpcServer.properties")) {
             properties = new Properties();
             properties.load(in);
         } catch (IOException e) {
@@ -52,8 +52,8 @@ public class Config {
      *
      * @return 服务器监听端口号。
      */
-    public static int getServerPort() {
-        String value = properties.getProperty("server.port");
+    public static int getPort() {
+        String value = properties.getProperty("port");
         if (value == null) {
             return 8080;
         } else {
@@ -66,8 +66,8 @@ public class Config {
      *
      * @return IP地址
      */
-    public static String getServerHost() {
-        String value = properties.getProperty("server.host");
+    public static String getHost() {
+        String value = properties.getProperty("host");
         if (value == null) {
             return "localhost";
         } else {
@@ -80,53 +80,12 @@ public class Config {
      *
      * @return 日志级别
      */
-    private static LogLevel getNettyLogLevel(String property) {
-        String value = properties.getProperty(property);
+    public static LogLevel getNettyLogLevel() {
+        String value = properties.getProperty("netty.loglevel");
         if (value == null) {
             return LogLevel.ERROR;
         } else {
             return LogLevel.valueOf(value);
-        }
-    }
-
-    /**
-     * 配置netty服务器日志级别。
-     *
-     * @return 日志级别
-     */
-    public static LogLevel getNettyServerLogLevel() {
-        return getNettyLogLevel("server.netty.loglevel");
-    }
-
-    public static LogLevel getNettyClientLogLevel() {
-        return getNettyLogLevel("client.netty.loglevel");
-    }
-
-    /**
-     * 配置Netty客户端失败重试次数。
-     *
-     * @return 重试次数
-     */
-    public static int getNettyClientRetryCount() {
-        String value = properties.getProperty("client.netty.retry");
-        if (value == null) {
-            return 1;
-        } else {
-            return Integer.parseInt(value);
-        }
-    }
-
-    /**
-     * 配置Netty客户端重连间隔事件。
-     *
-     * @return 间隔时间
-     */
-    public static int getNettyClientConnectTimeout() {
-        String value = properties.getProperty("client.netty.timeout");
-        if (value == null) {
-            return 5000;
-        } else {
-            return Integer.parseInt(value);
         }
     }
 

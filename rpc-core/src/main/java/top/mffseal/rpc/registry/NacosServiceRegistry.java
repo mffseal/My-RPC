@@ -3,7 +3,7 @@ package top.mffseal.rpc.registry;
 import com.alibaba.nacos.api.exception.NacosException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
 import top.mffseal.rpc.util.NacosUtil;
@@ -21,7 +21,7 @@ public class NacosServiceRegistry implements ServiceRegistry {
     @Override
     public void register(String serviceName, InetSocketAddress inetSocketAddress) {
         try {
-            NacosUtil.connectToNacosNamingService(Config.getNamingServerHost(), Config.getNamingServerPort());
+            NacosUtil.connectToNacosNamingService(RpcServerConfig.getNamingServerHost(), RpcServerConfig.getNamingServerPort());
             NacosUtil.registerService(serviceName, inetSocketAddress);
         } catch (NacosException e) {
             log.error("注册服务时发生错误: ", e);
