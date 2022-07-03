@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.Config;
+import top.mffseal.rpc.hook.ShutdownHook;
 import top.mffseal.rpc.provider.ServiceProvider;
 import top.mffseal.rpc.provider.ServiceProviderImpl;
 import top.mffseal.rpc.registry.NacosServiceRegistry;
@@ -61,6 +62,10 @@ public class NettyServer implements RpcServer {
                     });
             // 同步等待服务器绑定端口
             ChannelFuture future = serverBootstrap.bind(Config.getServerHost(), Config.getServerPort()).sync();
+
+            // 关闭后注销服务
+            ShutdownHook.getShutdownHock().addClearAllHock();
+
             // 同步等待服务器结束
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {

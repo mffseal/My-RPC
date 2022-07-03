@@ -1,7 +1,6 @@
 package top.mffseal.rpc.registry;
 
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.config.Config;
@@ -18,16 +17,12 @@ import java.net.InetSocketAddress;
  */
 public class NacosServiceRegistry implements ServiceRegistry {
     private static final Logger log = LoggerFactory.getLogger(NacosServiceRegistry.class);
-    private final NamingService namingServer;
-
-    public NacosServiceRegistry() {
-        namingServer = NacosUtil.getNacosNamingService(Config.getNamingServerHost(), Config.getNamingServerPort());
-    }
 
     @Override
     public void register(String serviceName, InetSocketAddress inetSocketAddress) {
         try {
-            NacosUtil.registerService(namingServer, serviceName, inetSocketAddress);
+            NacosUtil.connectToNacosNamingService(Config.getNamingServerHost(), Config.getNamingServerPort());
+            NacosUtil.registerService(serviceName, inetSocketAddress);
         } catch (NacosException e) {
             log.error("注册服务时发生错误: ", e);
             throw new RpcException(RpcError.REGISTER_SERVICE_FAILURE);

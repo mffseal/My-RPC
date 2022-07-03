@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +15,7 @@ import java.util.Map;
  * @author mffseal
  */
 public class SingletonFactory {
+    private static final Logger log = LoggerFactory.getLogger(SingletonFactory.class);
     /**
      * 记录所有已经实例化过的单例。
      */
@@ -46,6 +45,7 @@ public class SingletonFactory {
                         instance = clazz.newInstance();
                         objectMap.put(clazz, instance);
                     } catch (InstantiationException | IllegalAccessException e) {
+                        log.error("单例工厂创建 {} 失败: ", clazz.getCanonicalName());
                         throw new RuntimeException(e);
                     }
                 }
@@ -75,6 +75,7 @@ public class SingletonFactory {
                         objectMap.put(clazz, instance);
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |
                              InstantiationException e) {
+                        log.error("单例工厂创建 {} 失败: ", clazz.getCanonicalName());
                         throw new RuntimeException(e);
                     }
                 }
@@ -105,26 +106,12 @@ public class SingletonFactory {
                         instance = method.invoke(Factory, args);
                         objectMap.put(clazz, instance);
                     } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        log.error("单例工厂创建 {} 失败: ", clazz.getCanonicalName());
                         throw new RuntimeException(e);
                     }
                 }
             }
         }
         return clazz.cast(instance);
-    }
-
-    /**
-     * 本地测试。
-     * @param args 无用
-     */
-    public static void main(String[] args) {
-        Logger testLog = getInstance(Logger.class, LoggerFactory.class, "getLogger", new Class[]{Class.class}, new Object[]{SingletonFactory.class});
-        testLog.error("123");
-
-        Integer integer = getInstance(Integer.class, new Class[]{int.class}, new Object[]{1});
-        testLog.error("{}", integer);
-
-        List<Integer> list = getInstance(ArrayList.class);
-        testLog.error("{}", list);
     }
 }

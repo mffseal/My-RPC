@@ -1,7 +1,6 @@
 package top.mffseal.rpc.registry;
 
 import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,17 +15,13 @@ import java.util.List;
  */
 public class NacosServiceDiscovery implements ServiceDiscovery {
     private static final Logger log = LoggerFactory.getLogger(NacosServiceDiscovery.class);
-    private final NamingService namingService;
-
-    public NacosServiceDiscovery() {
-        namingService = NacosUtil.getNacosNamingService(Config.getNamingServerHost(), Config.getNamingServerPort());
-    }
 
     @Override
     public InetSocketAddress lookupService(String serviceName) {
         try {
+            NacosUtil.connectToNacosNamingService(Config.getNamingServerHost(), Config.getNamingServerPort());
             // 获取到某个服务的所有提供者列表
-            List<Instance> instances = NacosUtil.getAllInstances(namingService, serviceName);
+            List<Instance> instances = NacosUtil.getAllInstances(serviceName);
             // 目前均采用找到的第一个服务提供者
             // TODO 负载均衡
             Instance instance = instances.get(0);

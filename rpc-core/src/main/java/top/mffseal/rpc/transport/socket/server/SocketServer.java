@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.config.Config;
 import top.mffseal.rpc.factory.ThreadPoolFactory;
 import top.mffseal.rpc.handler.RequestHandler;
+import top.mffseal.rpc.hook.ShutdownHook;
 import top.mffseal.rpc.provider.ServiceProvider;
 import top.mffseal.rpc.provider.ServiceProviderImpl;
 import top.mffseal.rpc.registry.NacosServiceRegistry;
@@ -49,6 +50,10 @@ public class SocketServer implements RpcServer {
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(Config.getServerPort())) {
             logger.info("服务器启动中...");
+
+            // 关闭后注销服务
+            ShutdownHook.getShutdownHock().addClearAllHock();
+
             Socket socket;
             logger.info("{}", serverSocket);
             // 每收到一个请求，就创建一个工作线程

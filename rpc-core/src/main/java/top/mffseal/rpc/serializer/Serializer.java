@@ -46,8 +46,9 @@ public interface Serializer {
             // 遍历参数类型列表中的每个类型
             for (int i = 0; i < rpcRequestMessage.getParamTypes().length; i++) {
                 Class<?> clazz = rpcRequestMessage.getParamTypes()[i];
-                // 判断参数列表中的所有参数是否和参数类型列表中的类型一一对应
-                // 如果不对应了，那么用指定类型原地序列化再反序列化一次，并写回
+                // 判断参数列表中的所有参数是否和参数类型列表中的类型一一对应，
+                // 如果不对应了，那么用指定类型原地序列化再反序列化一次，并写回。（防止冗余操作）
+                // A.isAssignableFrom(B)，判断A是否是和B一样或是其super
                 if (!clazz.isAssignableFrom(rpcRequestMessage.getParameters()[i].getClass())) {
                     byte[] paramBytes = _this.serialize(rpcRequestMessage.getParameters()[i]);
                     rpcRequestMessage.getParameters()[i] = _this.deserialize(paramBytes, clazz);
