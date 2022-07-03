@@ -48,12 +48,11 @@ public class SocketServer implements RpcServer {
      * 注册服务。
      */
     public void start() {
+        // 关闭后注销服务
+        ShutdownHook.getShutdownHock().addClearAllHock();
+
         try (ServerSocket serverSocket = new ServerSocket(Config.getServerPort())) {
             logger.info("服务器启动中...");
-
-            // 关闭后注销服务
-            ShutdownHook.getShutdownHock().addClearAllHock();
-
             Socket socket;
             logger.info("{}", serverSocket);
             // 每收到一个请求，就创建一个工作线程

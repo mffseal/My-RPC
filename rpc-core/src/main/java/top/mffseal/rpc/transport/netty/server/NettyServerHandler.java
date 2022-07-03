@@ -42,7 +42,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequestMe
             try {
                 Object result = requestHandler.handle(msg);// 调用服务实现，返回的结果已经包装成RpcResponseMessage
                 ChannelFuture future = ctx.writeAndFlush(result);
-                future.addListener(ChannelFutureListener.CLOSE);  // 包发送完毕后关闭连接 todo 是否可以长连接?
+                future.addListener(ChannelFutureListener.CLOSE_ON_FAILURE);  // 操作失败或取消时关闭连接 todo 是否可以长连接?
             } finally {
                 ReferenceCountUtil.release(msg);  // 引用计数-1 TODO: 2022/6/28 确实需要手动释放资源码
             }

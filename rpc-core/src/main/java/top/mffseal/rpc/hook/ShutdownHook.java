@@ -2,6 +2,7 @@ package top.mffseal.rpc.hook;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.factory.ThreadPoolFactory;
 import top.mffseal.rpc.util.NacosUtil;
 
 /**
@@ -26,8 +27,11 @@ public class ShutdownHook {
      * 添加关闭时注销服务的钩子。
      */
     public void addClearAllHock() {
-        log.info("关闭后自动注销本机提供的所有服务");
-        Runtime.getRuntime().addShutdownHook(new Thread(NacosUtil::clearRegistry, "shutdownHockThread"));
+        log.info("将会在终端关闭时自动注销本机提供的所有服务，并尝试停止所有线程池");
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            NacosUtil.clearRegistry();
+            ThreadPoolFactory.shutdownAll();
+        }, "shutdownHockThread"));
     }
 
 }
