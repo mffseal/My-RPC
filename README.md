@@ -2,6 +2,9 @@
 
 # My-RPC
 
+![GitHub](https://img.shields.io/github/license/mffseal/MY-RPC)
+![jdk](https://img.shields.io/static/v1?label=oraclejdk&message=8&color=blue)
+
 MY-RPC 是一个RPC框架，支持接入多种服务管理平台（目前接入Nacos）、多种序列化算法、多种负载均衡算法，使用 Java 原生 Socket 于 Natty 实现了两套网络传输模块。
 
 ## OSCS
@@ -10,14 +13,17 @@ MY-RPC 是一个RPC框架，支持接入多种服务管理平台（目前接入N
 
 ## 架构
 
+![系统架构](images/architecture.png)
+
 ## 特性
 
+- 接口设计合理，模块之间低耦合，可以**灵活配置**诸如序列化算法、负载均衡算法等。
+- 实现通过**配置文件设置参数**，包括日志级别、序列化算法、负载均衡算法、IP地址等。
 - 实现基于 Java 原生 Socket 和 Netty 两套网络传输方式。
   - 使用 Netty 的 帧解码器(ProtocolFrameDecoder)配合协议长度字段，**解决粘包半包问题**。
   - Netty 自定义编解码器和请求响应 handler 使用 Sharable 设计进行 handler 复用，避免不必要的实例化。
   - Netty 客户端采用 Channel 池进行连接复用，避免重复连接同一服务器。
-- 接口设计合理，模块之间低耦合，可以**灵活配置**诸如序列化算法、负载均衡算法等。
-- 实现通过**配置文件设置参数**，包括日志级别、序列化算法、负载均衡算法、IP地址等。
+- 客户端接收 response 使用**生产者消费者模型**，配合 CompletableFuture 实现客户端同时多次 rpc 请求间不会相互阻塞。
 - 解决 json 类序列化 Object 集合中类型信息丢失问题（通过接口内部类实现公共方法）。
 - 可以**方便的接入不同序列化算法**，目前接入：
   - Gson
@@ -31,6 +37,8 @@ MY-RPC 是一个RPC框架，支持接入多种服务管理平台（目前接入N
   - 轮询算法
 - 使用 Nacos 作为服务注册和发现平台。
   - 服务端下线通过回调钩子自动向 Nacos 注销对应服务。
+- 实现单例工厂(用于)，支持无参构造，有参构造和构造工厂三种方式。
+- 项目注释完整，逻辑清晰。
 
 ## 模块
 
