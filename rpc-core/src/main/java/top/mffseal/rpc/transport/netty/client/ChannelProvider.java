@@ -12,95 +12,95 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.RpcClientConfig;
-import top.mffseal.rpc.enumeration.RpcError;
-import top.mffseal.rpc.exception.RpcException;
+import top.mffseal.rpc.handler.ResponseHandler;
+import top.mffseal.rpc.serializer.Serializer;
 
 import java.net.InetSocketAddress;
-import java.util.concurrent.CountDownLatch;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 客户端连接管理器，实现自动重试功能。
+ * 客户端连接管理器。
  *
  * @author mffseal
  */
 public class ChannelProvider {
     private static final Logger log = LoggerFactory.getLogger(ChannelProvider.class);
     private static EventLoopGroup eventExecutors;
-    private static Bootstrap bootstrap;
+    private static final Bootstrap bootstrap = initBootstrap();
     private static LoggingHandler loggingHandler;
-    private static MessageCodec messageCodec;
-    private static NettyClientHandler nettyClientHandler;
-    private static Channel channel;
-
+    private static ResponseHandler responseHandler;
     /**
-     * 最大重试次数
+     * 一个客户端可能同时连接多个服务提供者，所以需要用集合记录所有连接。
      */
-    private static final int MAX_RETRY_COUNT = RpcClientConfig.getNettyRetryCount();
+    private static final Map<String, Channel> channelMap = new ConcurrentHashMap<>();
 
     /**
-     * 向服务端建立连接，带重传功能。
+     * 获取一个目标服务端的连接。
      *
      * @param serverAddress 服务端地址
      * @return 连接channel
      */
-    public static Channel get(InetSocketAddress serverAddress) {
-        if (bootstrap == null)
-            bootstrap = initBootstrap();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        try {
-            connect(serverAddress, countDownLatch);
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            log.error("获取channel时发生错误:", e);
+    public static Channel get(InetSocketAddress serverAddress, Serializer.Library serializer) {
+        // 客户端可以同时使用不同的序列化方案，这里特征需要加上序列化方案编号
+        String target = serverAddress.toString() + serializer.ordinal();
+        if (channelMap.containsKey(target)) {
+            Channel channel = channelMap.get(target);
+            // 删除失效的channel
+            if (channel != null && channel.isActive()) {
+                return channel;
+            } else {
+                channelMap.remove(target);
+            }
         }
+
+        // 客户端需要channel后再组装bootstrap
+        bootstrap.handler(new ChannelInitializer<SocketChannel>() {
+            @Override
+            protected void initChannel(SocketChannel ch) {
+                ch.pipeline().addLast(new ProtocolFrameDecoder());
+                ch.pipeline().addLast(loggingHandler);
+                ch.pipeline().addLast(new MessageCodec(serializer));  // 序列化方案不写死
+                // 心跳超时3秒
+                ch.pipeline().addLast(new IdleStateHandler(0, 3, 0, TimeUnit.SECONDS));
+                ch.pipeline().addLast(responseHandler);
+            }
+        });
+
+        // 尝试与服务器建立连接
+        Channel channel;
+        try {
+            channel = connect(serverAddress);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("连接到服务器 {} 失败", serverAddress);
+            return null;
+        }
+        channelMap.put(target, channel);
         return channel;
     }
 
     /**
-     * 进行连接建立的中间方法。
+     * 进行连接建立。
      *
-     * @param serverAddress  服务端地址
-     * @param countDownLatch 同步状态
+     * @param serverAddress 服务端地址
      */
-    private static void connect(InetSocketAddress serverAddress, CountDownLatch countDownLatch) {
-        connect(serverAddress, countDownLatch, MAX_RETRY_COUNT);
-    }
-
-    /**
-     * 进行带重试的连接建立。
-     *
-     * @param serverAddress  服务端地址
-     * @param countDownLatch 同步状态
-     * @param retry          当前重试上限
-     */
-    private static void connect(InetSocketAddress serverAddress, CountDownLatch countDownLatch, int retry) {
+    private static Channel connect(InetSocketAddress serverAddress) throws ExecutionException, InterruptedException {
+        CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
         bootstrap.connect(serverAddress).addListener((ChannelFutureListener) future -> {
-            // 成功连接
+            // 通过回调函数的方式，在连接成功时将建立的channel放入completableFuture
             if (future.isSuccess()) {
-                log.info("客户端连接到服务器成功");
-                channel = future.channel();
-                countDownLatch.countDown();
-                return;
+                log.info("连接到服务器 {} 成功", serverAddress);
+                completableFuture.complete(future.channel());
+            } else {
+                // 连接失败在上层函数调用处处理，这里不打印log
+                throw new IllegalAccessException();
             }
-
-            // 重试指定次数仍无法成功连接
-            if (retry == 0) {
-                log.error("客户端连接到服务器失败，并且重试次数已用完，放弃连接。");
-                countDownLatch.countDown();
-                throw new RpcException(RpcError.CLIENT_CONNECT_SERVER_FAILURE);
-            }
-
-            // 重试次数
-            int order = MAX_RETRY_COUNT - retry + 1;
-
-            // 本轮重试启动延迟，每次增加1（单位秒）
-            // TODO 优化重试算法
-            int delay = 1 + order;
-            log.error("客户端连接服务端失败: {} 秒后将进行第 {}/{} 次重试", delay, order, MAX_RETRY_COUNT);
-            // 添加一个定时任务
-            bootstrap.config().group().schedule(() -> connect(serverAddress, countDownLatch, retry - 1), delay, TimeUnit.SECONDS);
         });
+        // 阻塞等待completableFuture对端complete
+        return completableFuture.get();
     }
 
     /**
@@ -114,35 +114,20 @@ public class ChannelProvider {
         bootstrap.group(eventExecutors)
                 .channel(NioSocketChannel.class)
                 //连接的超时时间，超过这个时间还是建立不上的话则代表连接失败
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, RpcClientConfig.getNettyConnectTimeout())
-                //是否开启 TCP 底层心跳机制
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .handler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new ProtocolFrameDecoder());
-                        ch.pipeline().addLast(loggingHandler);
-                        ch.pipeline().addLast(messageCodec);
-                        // 心跳超时3秒
-                        ch.pipeline().addLast(new IdleStateHandler(0, 3, 0, TimeUnit.SECONDS));
-                        ch.pipeline().addLast(nettyClientHandler);
-                    }
-                });
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, RpcClientConfig.getNettyConnectTimeout());
         return bootstrap;
     }
 
     /**
-     * 懒加载Bootstrap需要用到的类。
+     * 懒加载Bootstrap需要用到的共享时线程安全的类，不包括编解码器。
      */
     private static void lazyInitTools() {
         if (eventExecutors == null)
             eventExecutors = new NioEventLoopGroup();
         if (loggingHandler == null)
             loggingHandler = new LoggingHandler(RpcClientConfig.getNettyLogLevel());
-        if (messageCodec == null)
-            messageCodec = new MessageCodec(RpcClientConfig.getSerializerLibrary());
-        if (nettyClientHandler == null)
-            nettyClientHandler = new NettyClientHandler();
+        if (responseHandler == null)
+            responseHandler = new ResponseHandler();
     }
 
 }

@@ -1,6 +1,7 @@
 package top.mffseal.rpc.codec;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import java.util.List;
  *
  * @author mffseal
  */
+@ChannelHandler.Sharable
 public class MessageCodec extends MessageToMessageCodec<ByteBuf, Message> {
     private static final Logger log = LoggerFactory.getLogger(MessageCodec.class);
     private static final int MAGIC_NUMBER = 0xCAFEBABE;

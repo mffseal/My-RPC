@@ -3,11 +3,16 @@ package top.mffseal.rpc.transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
+import top.mffseal.rpc.entity.RpcResponseMessage;
+import top.mffseal.rpc.transport.netty.client.NettyClient;
+import top.mffseal.rpc.transport.socket.client.SocketClient;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * 一个代理拦截器，负责将本地调用拦截到rpc调用；
@@ -17,7 +22,7 @@ import java.util.UUID;
  */
 
 public class RpcClientProxy implements InvocationHandler {
-    private static final Logger logger = LoggerFactory.getLogger(RpcClientProxy.class);
+    private static final Logger log = LoggerFactory.getLogger(RpcClientProxy.class);
 
     private final RpcClient client;
 
@@ -49,10 +54,30 @@ public class RpcClientProxy implements InvocationHandler {
      */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
-        logger.info("调用方法: {}#{}", method.getDeclaringClass().getName(), method.getName());
+        log.info("调用方法: {}#{}", method.getDeclaringClass().getName(), method.getName());
         RpcRequestMessage rpcRequestMessage = new RpcRequestMessage(UUID.randomUUID().toString(), method.getDeclaringClass().getName(),
                 method.getName(), args, method.getParameterTypes(), false);
-        // proxy不负责解析收到的RpcResponse
-        return client.sendRequest(rpcRequestMessage);
+        Object result = null;
+
+        // Netty实现和Socket实现上，对收到的响应处理方式不同
+
+        // Netty客户端
+        // proxy需要解析RpcResponse，调用getData
+        if (client instanceof NettyClient) {
+            CompletableFuture<RpcResponseMessage<?>> completableFuture = ((NettyClient) client).sendRequest(rpcRequestMessage);
+            try {
+                result = completableFuture.get().getData();  // 这里需要getData
+            } catch (ExecutionException | InterruptedException e) {
+                log.error("RPC调用失败", e);
+            }
+        }
+
+        // Socket客户端
+        // proxy不负责解析收到的RpcResponse，直接原封不动返回
+        if (client instanceof SocketClient) {
+            result = client.sendRequest(rpcRequestMessage);
+        }
+
+        return result;
     }
 }

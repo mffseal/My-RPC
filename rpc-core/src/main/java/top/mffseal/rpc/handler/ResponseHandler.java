@@ -1,33 +1,37 @@
-package top.mffseal.rpc.transport.netty.client;
+package top.mffseal.rpc.handler;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
-import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
+import top.mffseal.rpc.factory.SingletonFactory;
+import top.mffseal.rpc.transport.netty.client.NettyClient;
+import top.mffseal.rpc.transport.netty.client.ResponseLocker;
 
 /**
- * Netty下处理客户端收到的RpcResponseMessage的handler。
+ * Netty下，用于处理客户端收到的{@link RpcResponseMessage}的handler，将响应填充到{@link ResponseLocker}中对应的位置。
  *
  * @author mffseal
  */
 @ChannelHandler.Sharable
-public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponseMessage<?>> {
-    private static final Logger log = LoggerFactory.getLogger(NettyClientHandler.class);
+public class ResponseHandler extends SimpleChannelInboundHandler<RpcResponseMessage<?>> {
+    private static final Logger log = LoggerFactory.getLogger(ResponseHandler.class);
+    /**
+     * 用单例模式保证与{@link NettyClient}对象使用的是同一个快递柜。
+     */
+    private static final ResponseLocker responseLocker = SingletonFactory.getInstance(ResponseLocker.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcResponseMessage msg) {
         try {
             log.info("客户端收到消息: {}", msg);
-            AttributeKey<RpcResponseMessage<?>> key = AttributeKey.valueOf("rpcResponse" + msg.getSequenceId());
-            ctx.channel().attr(key).set(msg);
-            ctx.channel().close();
+            responseLocker.complete(msg);
         } finally {
             ReferenceCountUtil.release(msg);
         }
