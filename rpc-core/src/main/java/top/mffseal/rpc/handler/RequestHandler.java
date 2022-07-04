@@ -1,5 +1,6 @@
 package top.mffseal.rpc.handler;
 
+import io.netty.channel.ChannelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
@@ -13,18 +14,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * 处理过程调用（通过反射的方式）。
+ * Netty下，用于处理服务端收到的{@link RpcRequestMessage}的handler，根据请求内容调用本机服务实现，并将结果打包成{@link RpcResponseMessage}返回。
  *
  * @author mffseal
  */
+@ChannelHandler.Sharable
 public class RequestHandler {
-
     private static final Logger logger = LoggerFactory.getLogger(RequestHandlerThread.class);
-    private static final ServiceProvider serviceProvider;
-
-    static {
-        serviceProvider = new ServiceProviderImpl();
-    }
+    private static final ServiceProvider serviceProvider = new ServiceProviderImpl();
 
     /**
      * 在service上调用rpcRequest中指定的方法，并返回包装成RpcResponseMessage的结果。

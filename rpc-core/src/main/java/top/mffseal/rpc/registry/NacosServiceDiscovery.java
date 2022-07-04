@@ -5,7 +5,6 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.config.RpcClientConfig;
-import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.util.NacosUtil;
 
 import java.net.InetSocketAddress;

@@ -6,7 +6,7 @@ import top.mffseal.rpc.factory.ThreadPoolFactory;
 import top.mffseal.rpc.util.NacosUtil;
 
 /**
- * 服务提供者关闭服务器时，向服务管理平台注销对应服务的回调类。
+ * 服务端关闭服务器时，向服务管理平台注销对应服务的回调类。
  *
  * @author mffseal
  */

@@ -52,7 +52,6 @@ public class NettyServer implements RpcServer {
                     .channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .option(ChannelOption.SO_BACKLOG, 256)  // 全连接队列大小
-                    .option(ChannelOption.SO_KEEPALIVE, true)  // tcp保活探测
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) {

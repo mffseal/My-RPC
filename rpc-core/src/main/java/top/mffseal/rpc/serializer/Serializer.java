@@ -42,6 +42,8 @@ public interface Serializer {
          */
         public static Object handleRequestParametersList(Serializer _this, Object obj) {
             RpcRequestMessage rpcRequestMessage = (RpcRequestMessage) obj;
+            if (rpcRequestMessage.getHeartBeat())
+                return rpcRequestMessage;
 
             // 遍历参数类型列表中的每个类型
             for (int i = 0; i < rpcRequestMessage.getParamTypes().length; i++) {
