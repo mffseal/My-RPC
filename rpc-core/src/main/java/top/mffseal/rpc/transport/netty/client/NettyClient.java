@@ -9,6 +9,7 @@ import top.mffseal.rpc.config.RpcClientConfig;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.factory.SingletonFactory;
+import top.mffseal.rpc.loadbalancer.LoadBalancer;
 import top.mffseal.rpc.registry.NacosServiceDiscovery;
 import top.mffseal.rpc.registry.ServiceDiscovery;
 import top.mffseal.rpc.serializer.Serializer;
@@ -27,10 +28,11 @@ public class NettyClient implements RpcClient {
     private static final Logger log = LoggerFactory.getLogger(NettyClient.class);
     private final ServiceDiscovery serviceDiscovery;
     private final Serializer.Library serializer = RpcClientConfig.getSerializerLibrary();
+    private final LoadBalancer.Library loadBalancer = RpcClientConfig.getLoadBalancer();
     private final ResponseLocker responseLocker;
 
     public NettyClient() {
-        serviceDiscovery = new NacosServiceDiscovery();
+        serviceDiscovery = new NacosServiceDiscovery(loadBalancer);
         // 用单例模式保证和 NettyClientHandler 使用同一个快递柜
         responseLocker = SingletonFactory.getInstance(ResponseLocker.class);
     }

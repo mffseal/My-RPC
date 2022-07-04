@@ -32,7 +32,7 @@ public class RpcServerConfig {
     public static Serializer.Library getSerializerLibrary() {
         String value = properties.getProperty("serializer.library");
         if (value == null) {
-            return Serializer.Library.Jackson;
+            return Serializer.Library.values()[0];
         } else {
             return Serializer.Library.valueOf(value);
         }

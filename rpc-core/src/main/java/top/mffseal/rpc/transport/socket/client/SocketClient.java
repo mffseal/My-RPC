@@ -2,11 +2,13 @@ package top.mffseal.rpc.transport.socket.client;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.config.RpcClientConfig;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.enumeration.ResponseCode;
 import top.mffseal.rpc.enumeration.RpcError;
 import top.mffseal.rpc.exception.RpcException;
+import top.mffseal.rpc.loadbalancer.LoadBalancer;
 import top.mffseal.rpc.registry.NacosServiceDiscovery;
 import top.mffseal.rpc.registry.ServiceDiscovery;
 import top.mffseal.rpc.transport.RpcClient;
@@ -31,10 +33,11 @@ import java.net.Socket;
 public class SocketClient implements RpcClient {
     private static final Logger logger = LoggerFactory.getLogger(SocketClient.class);
 
+    private final LoadBalancer.Library loadBalancer = RpcClientConfig.getLoadBalancer();
     private final ServiceDiscovery serviceDiscovery;
 
     public SocketClient() {
-        serviceDiscovery = new NacosServiceDiscovery();
+        serviceDiscovery = new NacosServiceDiscovery(loadBalancer);
     }
 
     /**

@@ -1,6 +1,7 @@
 package top.mffseal.rpc.config;
 
 import io.netty.handler.logging.LogLevel;
+import top.mffseal.rpc.loadbalancer.LoadBalancer;
 import top.mffseal.rpc.serializer.Serializer;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class RpcClientConfig {
     public static Serializer.Library getSerializerLibrary() {
         String value = properties.getProperty("serializer.library");
         if (value == null) {
-            return Serializer.Library.Jackson;
+            return Serializer.Library.values()[0];
         } else {
             return Serializer.Library.valueOf(value);
         }
@@ -114,6 +115,20 @@ public class RpcClientConfig {
             return 5000;
         } else {
             return Integer.parseInt(value);
+        }
+    }
+
+    /**
+     * 配置客户端负载均衡器。
+     *
+     * @return 负载均衡器
+     */
+    public static LoadBalancer.Library getLoadBalancer() {
+        String value = properties.getProperty("loadBalancer");
+        if (value == null) {
+            return LoadBalancer.Library.values()[0];
+        } else {
+            return LoadBalancer.Library.valueOf(value);
         }
     }
 
