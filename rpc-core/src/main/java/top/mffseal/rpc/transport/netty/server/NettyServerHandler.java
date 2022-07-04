@@ -10,12 +10,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.factory.ThreadPoolFactory;
-import top.mffseal.rpc.handler.RequestHandler;
+import top.mffseal.rpc.handler.ServerInvokeHandler;
 
 import java.util.concurrent.ExecutorService;
 
 /**
- * Netty下处理服务端收到的RpcRequestMessage的handler。
+ * Netty下用于处理服务端收到的{@link RpcRequestMessage}的handler。
  *
  * @author mffseal
  */
@@ -30,11 +30,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequestMe
     /**
      * Sharable的handler加上是static final修饰，所以requestHandler不用单例工厂就能线程安全的进行单例模式实例化。
      */
-    private static final RequestHandler requestHandler;
+    private static final ServerInvokeHandler SERVER_INVOKE_HANDLER;
 
     // 初始化
     static {
-        requestHandler = new RequestHandler();
+        SERVER_INVOKE_HANDLER = new ServerInvokeHandler();
         threadPool = ThreadPoolFactory.createDefaultThreadPool(THREAD_NAME_PREFIX);
     }
 
@@ -48,7 +48,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequestMe
                     log.info("收到 {} 客户端的心跳包", ctx.channel().remoteAddress());
                     return;
                 }
-                Object result = requestHandler.handle(msg);// 调用服务实现，返回的结果已经包装成RpcResponseMessage
+                Object result = SERVER_INVOKE_HANDLER.handle(msg);// 调用服务实现handler，由其再调用具体服务实现。返回的结果已经包装成RpcResponseMessage
                 if (ctx.channel().isActive() && ctx.channel().isWritable()) {
                     ctx.writeAndFlush(result);
                 } else {

@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.codec.MessageCodec;
 import top.mffseal.rpc.codec.ProtocolFrameDecoder;
 import top.mffseal.rpc.config.RpcClientConfig;
-import top.mffseal.rpc.handler.ResponseHandler;
 import top.mffseal.rpc.serializer.Serializer;
 
 import java.net.InetSocketAddress;
@@ -32,7 +31,7 @@ public class ChannelProvider {
     private static EventLoopGroup eventExecutors;
     private static final Bootstrap bootstrap = initBootstrap();
     private static LoggingHandler loggingHandler;
-    private static ResponseHandler responseHandler;
+    private static NettyClientHandler nettyClientHandler;
     /**
      * 一个客户端可能同时连接多个服务提供者，所以需要用集合记录所有连接。
      */
@@ -66,7 +65,7 @@ public class ChannelProvider {
                 ch.pipeline().addLast(new MessageCodec(serializer));  // 序列化方案不写死
                 // 心跳超时3秒
                 ch.pipeline().addLast(new IdleStateHandler(0, 3, 0, TimeUnit.SECONDS));
-                ch.pipeline().addLast(responseHandler);
+                ch.pipeline().addLast(nettyClientHandler);
             }
         });
 
@@ -126,8 +125,8 @@ public class ChannelProvider {
             eventExecutors = new NioEventLoopGroup();
         if (loggingHandler == null)
             loggingHandler = new LoggingHandler(RpcClientConfig.getNettyLogLevel());
-        if (responseHandler == null)
-            responseHandler = new ResponseHandler();
+        if (nettyClientHandler == null)
+            nettyClientHandler = new NettyClientHandler();
     }
 
 }

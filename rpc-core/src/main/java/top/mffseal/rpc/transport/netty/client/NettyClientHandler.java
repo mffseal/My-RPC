@@ -1,4 +1,4 @@
-package top.mffseal.rpc.handler;
+package top.mffseal.rpc.transport.netty.client;
 
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
 import top.mffseal.rpc.entity.RpcResponseMessage;
 import top.mffseal.rpc.factory.SingletonFactory;
-import top.mffseal.rpc.transport.netty.client.NettyClient;
-import top.mffseal.rpc.transport.netty.client.ResponseLocker;
 
 /**
  * Netty下，用于处理客户端收到的{@link RpcResponseMessage}的handler，将响应填充到{@link ResponseLocker}中对应的位置。
@@ -20,8 +18,8 @@ import top.mffseal.rpc.transport.netty.client.ResponseLocker;
  * @author mffseal
  */
 @ChannelHandler.Sharable
-public class ResponseHandler extends SimpleChannelInboundHandler<RpcResponseMessage<?>> {
-    private static final Logger log = LoggerFactory.getLogger(ResponseHandler.class);
+public class NettyClientHandler extends SimpleChannelInboundHandler<RpcResponseMessage<?>> {
+    private static final Logger log = LoggerFactory.getLogger(NettyClientHandler.class);
     /**
      * 用单例模式保证与{@link NettyClient}对象使用的是同一个快递柜。
      */

@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.factory.ThreadPoolFactory;
-import top.mffseal.rpc.handler.RequestHandler;
+import top.mffseal.rpc.handler.ServerInvokeHandler;
 import top.mffseal.rpc.hook.ShutdownHook;
 import top.mffseal.rpc.provider.ServiceProvider;
 import top.mffseal.rpc.provider.ServiceProviderImpl;
@@ -33,7 +33,7 @@ public class SocketServer implements RpcServer {
     private final ExecutorService threadPool;
     private final ServiceProvider serviceProvider;
     private final ServiceRegistry serviceRegistry;
-    private final RequestHandler requestHandler = new RequestHandler();
+    private final ServerInvokeHandler serverInvokeHandler = new ServerInvokeHandler();
 
     /**
      * 初始化工作线程池。
@@ -58,7 +58,7 @@ public class SocketServer implements RpcServer {
             // 每收到一个请求，就创建一个工作线程
             while ((socket = serverSocket.accept()) != null) {
                 logger.info("客户端连接! 地址: " + socket.getInetAddress() + ":" + socket.getPort());
-                threadPool.execute(new RequestHandlerThread(socket, requestHandler));
+                threadPool.execute(new RequestHandlerThread(socket, serverInvokeHandler));
             }
             threadPool.shutdown();
         } catch (IOException e) {

@@ -3,7 +3,7 @@ package top.mffseal.rpc.transport.socket.server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.entity.RpcRequestMessage;
-import top.mffseal.rpc.handler.RequestHandler;
+import top.mffseal.rpc.handler.ServerInvokeHandler;
 import top.mffseal.rpc.transport.socket.util.ObjectReader;
 import top.mffseal.rpc.transport.socket.util.ObjectWriter;
 
@@ -25,11 +25,11 @@ public class RequestHandlerThread implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandlerThread.class);
     private final Socket socket;
-    private final RequestHandler requestHandler;
+    private final ServerInvokeHandler serverInvokeHandler;
 
-    public RequestHandlerThread(Socket socket, RequestHandler requestHandler) {
+    public RequestHandlerThread(Socket socket, ServerInvokeHandler serverInvokeHandler) {
         this.socket = socket;
-        this.requestHandler = requestHandler;
+        this.serverInvokeHandler = serverInvokeHandler;
     }
 
     /**
@@ -43,7 +43,7 @@ public class RequestHandlerThread implements Runnable {
             String interfaceName = rpcRequestMessage.getInterfaceName();
             logger.info("需要查找的接口名: {}", interfaceName);
             // 间接调用服务实现
-            Object rpcResponse = requestHandler.handle(rpcRequestMessage);
+            Object rpcResponse = serverInvokeHandler.handle(rpcRequestMessage);
             ObjectWriter.writeObject(outputStream, rpcResponse);
         } catch (IOException e) {
             logger.error("调用或发送时有错误发生: ", e);
