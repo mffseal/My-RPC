@@ -1,7 +1,6 @@
-[![OSCS Status](https://www.oscs1024.com/platform/badge/mffseal/My-RPC.svg?size=small)](https://www.oscs1024.com/project/mffseal/My-RPC?ref=badge_small)
-
 # My-RPC
 
+[![OSCS Status](https://www.oscs1024.com/platform/badge/mffseal/My-RPC.svg?size=small)](https://www.oscs1024.com/project/mffseal/My-RPC?ref=badge_small)
 ![GitHub](https://img.shields.io/github/license/mffseal/MY-RPC)
 ![jdk](https://img.shields.io/static/v1?label=oraclejdk&message=8&color=blue)
 
