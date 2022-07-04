@@ -7,6 +7,8 @@ import top.mffseal.rpc.transport.RpcClientProxy;
 import top.mffseal.rpc.transport.netty.client.NettyClient;
 
 /**
+ * 测试用Netty客户端。
+ *
  * @author mffseal
  */
 public class NettyTestClient {

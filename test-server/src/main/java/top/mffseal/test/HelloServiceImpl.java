@@ -6,6 +6,8 @@ import top.mffseal.rpc.api.HelloObject;
 import top.mffseal.rpc.api.HelloService;
 
 /**
+ * 服务端测试用服务实现。
+ *
  * @author mffseal
  */
 

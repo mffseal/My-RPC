@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * 客户端向服务端传递的参数对应的类。
+ * 测试调用接口中，客户端向服务端传递的参数对应的类。
  *
  * @author mffseal
  */

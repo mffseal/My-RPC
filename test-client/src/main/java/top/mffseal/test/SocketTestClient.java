@@ -7,6 +7,8 @@ import top.mffseal.rpc.transport.RpcClientProxy;
 import top.mffseal.rpc.transport.socket.client.SocketClient;
 
 /**
+ * 测试用Socket客户端。
+ *
  * @author mffseal
  */
 public class SocketTestClient {

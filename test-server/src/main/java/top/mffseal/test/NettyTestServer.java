@@ -5,6 +5,8 @@ import top.mffseal.rpc.transport.RpcServer;
 import top.mffseal.rpc.transport.netty.server.NettyServer;
 
 /**
+ * 测试用Netty服务端
+ *
  * @author mffseal
  */
 public class NettyTestServer {

@@ -5,6 +5,8 @@ import top.mffseal.rpc.transport.RpcServer;
 import top.mffseal.rpc.transport.socket.server.SocketServer;
 
 /**
+ * 测试用Socket服务端。
+ *
  * @author mffseal
  */
 public class SocketTestServer {

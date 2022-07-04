@@ -1,10 +1,10 @@
 package top.mffseal.rpc.api;
 
 /**
+ * 测试用某服务调用接口。
+ *
  * @author mffseal
  */
-
-
 public interface HelloService {
     /**
      * 测试服务
