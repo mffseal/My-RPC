@@ -2,6 +2,7 @@ package top.mffseal.test;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import top.mffseal.rpc.annotation.Service;
 import top.mffseal.rpc.api.HelloObject;
 import top.mffseal.rpc.api.HelloService;
 
@@ -10,7 +11,7 @@ import top.mffseal.rpc.api.HelloService;
  *
  * @author mffseal
  */
-
+@Service
 public class HelloServiceImpl implements HelloService {
     private final Logger logger = LoggerFactory.getLogger(HelloServiceImpl.class);
 

@@ -14,9 +14,9 @@ public interface RpcServer {
     /**
      * 向服务管理平台和本地服务记录表注册服务实现。
      *
-     * @param service      服务实现对象
-     * @param serviceClass 服务接口
-     * @param <T>          服务类型
+     * @param service     服务实现对象
+     * @param serviceName 服务接口名
+     * @param <T>         服务类型
      */
-    <T> void publishService(T service, Class<T> serviceClass);
+    <T> void publishService(T service, String serviceName);
 }

@@ -21,7 +21,8 @@ MY-RPC 是一个RPC框架，支持接入多种服务管理平台（目前接入N
 - 实现基于 Java 原生 Socket 和 Netty 两套网络传输方式。
   - 使用 Netty 的 帧解码器(ProtocolFrameDecoder)配合协议长度字段，**解决粘包半包问题**。
   - Netty 自定义编解码器和请求响应 handler 使用 Sharable 设计进行 handler 复用，避免不必要的实例化。
-  - Netty 客户端采用 Channel 池进行连接复用，避免重复连接同一服务器。
+  - Netty 客户端采用 Channel 池进行**连接复用**，避免重复连接同一服务器。
+  - Netty 采用**心跳机制**避免客户端假死占用服务端资源。
 - 客户端接收 response 使用**生产者消费者模型**，配合 CompletableFuture 实现客户端同时多次 rpc 请求间不会相互阻塞。
 - 解决 json 类序列化 Object 集合中类型信息丢失问题（通过接口内部类实现公共方法）。
 - 可以**方便的接入不同序列化算法**，目前接入：
@@ -36,6 +37,7 @@ MY-RPC 是一个RPC框架，支持接入多种服务管理平台（目前接入N
   - 轮询算法
 - 使用 Nacos 作为服务注册和发现平台。
   - 服务端下线通过回调钩子自动向 Nacos 注销对应服务。
+- 可通过注解自动扫描服务实现并注册。
 - 实现单例工厂(用于)，支持无参构造，有参构造和构造工厂三种方式。
 - 项目注释完整，逻辑清晰。
 
@@ -249,7 +251,7 @@ namingServer.port=Nacos服务器端口
 1. 启动前，请确保服务端和客户端均能连接到Nacos服务器，并且在服务端和客户端的配置文件中配置了Nacos服务器地址和端口。
 2. 分别启动服务端和客户端，观察控制台输出内容。
 
-## 重点设计
+## 关键设计
 
 ### Netty客户端生产消费模型
 
@@ -260,6 +262,15 @@ namingServer.port=Nacos服务器端口
 5. 服务器收到请求后会调用方法，并返回一个RpcResponse。
 6. 客户端的ResponseHandler收到RpcResponse后会向ResponseLocker对应位置的CompletableFuture调用complete（填充response）。
 7. complete会唤醒RpcClientProxy调用的get处，并将结果传递过去。
+
+### 服务自动注册
+
+通过注解扫描的方式自动注册服务：
+
+1. 扫描当前包下所有Class类。
+2. 遍历查找含有@Service注解的类对象。
+3. 检查@Service的name属性是否为空
+  - 不为空则使用name的值作为
 
 ## LICENSE
 

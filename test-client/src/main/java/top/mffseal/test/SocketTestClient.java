@@ -1,5 +1,6 @@
 package top.mffseal.test;
 
+import top.mffseal.rpc.api.ByeService;
 import top.mffseal.rpc.api.HelloObject;
 import top.mffseal.rpc.api.HelloService;
 import top.mffseal.rpc.transport.RpcClient;
@@ -24,5 +25,9 @@ public class SocketTestClient {
 
         String res = helloService.hello(object);
         System.out.println(res);
+
+        ByeService byeService = proxy.getProxy(ByeService.class);
+        String res2 = byeService.bye("socketClient");
+        System.out.println(res2);
     }
 }

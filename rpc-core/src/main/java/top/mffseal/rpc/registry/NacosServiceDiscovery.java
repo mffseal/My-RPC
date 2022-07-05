@@ -5,6 +5,8 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import top.mffseal.rpc.config.RpcClientConfig;
+import top.mffseal.rpc.enumeration.RpcError;
+import top.mffseal.rpc.exception.RpcException;
 import top.mffseal.rpc.loadbalancer.LoadBalancer;
 import top.mffseal.rpc.util.NacosUtil;
 
@@ -28,6 +30,10 @@ public class NacosServiceDiscovery implements ServiceDiscovery {
             NacosUtil.connectToNacosNamingService(RpcClientConfig.getNamingServerHost(), RpcClientConfig.getNamingServerPort());
             // 获取到某个服务的所有提供者列表
             List<Instance> instances = NacosUtil.getAllInstances(serviceName);
+            if (instances.size() == 0) {
+                log.error("找不到对应的服务: " + serviceName);
+                throw new RpcException(RpcError.SERVICE_NOT_FOUND);
+            }
 
             // 应用负载均衡算法
             Instance instance = loadBalancer.select(instances);

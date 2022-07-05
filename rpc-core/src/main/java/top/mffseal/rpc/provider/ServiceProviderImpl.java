@@ -41,9 +41,8 @@ public class ServiceProviderImpl implements ServiceProvider {
      * @param <T>     服务实体类
      */
     @Override
-    public <T> void addServiceProvider(T service, Class<T> serviceClass) {
+    public <T> void addServiceProvider(T service, String serviceName) {
         // 记录服务
-        String serviceName = serviceClass.getCanonicalName();  // 获取服务的全路径名
         if (registeredService.contains(serviceName)) return;
         registeredService.add(serviceName);
 

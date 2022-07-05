@@ -6,14 +6,11 @@ import top.mffseal.rpc.config.RpcServerConfig;
 import top.mffseal.rpc.factory.ThreadPoolFactory;
 import top.mffseal.rpc.handler.ServerInvokeHandler;
 import top.mffseal.rpc.hook.ShutdownHook;
-import top.mffseal.rpc.provider.ServiceProvider;
 import top.mffseal.rpc.provider.ServiceProviderImpl;
 import top.mffseal.rpc.registry.NacosServiceRegistry;
-import top.mffseal.rpc.registry.ServiceRegistry;
-import top.mffseal.rpc.transport.RpcServer;
+import top.mffseal.rpc.transport.AbstractRpcServer;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
@@ -26,13 +23,11 @@ import java.util.concurrent.ExecutorService;
  *
  * @author mffseal
  */
-public class SocketServer implements RpcServer {
+public class SocketServer extends AbstractRpcServer {
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
 
 
     private final ExecutorService threadPool;
-    private final ServiceProvider serviceProvider;
-    private final ServiceRegistry serviceRegistry;
     private final ServerInvokeHandler serverInvokeHandler = new ServerInvokeHandler();
 
     /**
@@ -42,6 +37,7 @@ public class SocketServer implements RpcServer {
         serviceRegistry = new NacosServiceRegistry();
         serviceProvider = new ServiceProviderImpl();
         threadPool = ThreadPoolFactory.createDefaultThreadPool("SocketRpcServer");
+        scanServices();
     }
 
     /**
@@ -65,11 +61,4 @@ public class SocketServer implements RpcServer {
             logger.error("连接时发生错误: ", e);
         }
     }
-
-    @Override
-    public <T> void publishService(T service, Class<T> serviceClass) {
-        serviceProvider.addServiceProvider(service, serviceClass);
-        serviceRegistry.register(serviceClass.getCanonicalName(), new InetSocketAddress(RpcServerConfig.getHost(), RpcServerConfig.getPort()));
-    }
-
 }

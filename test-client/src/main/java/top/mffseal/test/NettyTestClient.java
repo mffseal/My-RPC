@@ -1,5 +1,6 @@
 package top.mffseal.test;
 
+import top.mffseal.rpc.api.ByeService;
 import top.mffseal.rpc.api.HelloObject;
 import top.mffseal.rpc.api.HelloService;
 import top.mffseal.rpc.transport.RpcClient;
@@ -20,7 +21,9 @@ public class NettyTestClient {
         // 轮询算法的效果要同一个客户端多次调用同一个接口才能看出
         String res = helloServer.hello(helloObject);
         String res2 = helloServer.hello(helloObject);
-        String res3 = helloServer.hello(helloObject);
-        System.out.println(res);
+
+        ByeService byeService = rpcClientProxy.getProxy(ByeService.class);
+        String res3 = byeService.bye("nettyClient");
+        System.out.println(res3);
     }
 }
