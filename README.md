@@ -1,7 +1,8 @@
 # My-RPC
 
+![example workflow](https://github.com/mffseal/My-RPC/actions/workflows/maven.yml/badge.svg)
 [![OSCS Status](https://www.oscs1024.com/platform/badge/mffseal/My-RPC.svg?size=small)](https://www.oscs1024.com/project/mffseal/My-RPC?ref=badge_small)
-![GitHub](https://img.shields.io/github/license/mffseal/MY-RPC)
+![GitHub](https://img.shields.io/github/license/mffseal/My-RPC)
 ![jdk](https://img.shields.io/static/v1?label=oraclejdk&message=8&color=blue)
 
 MY-RPC 是一个RPC框架，支持接入多种服务管理平台（目前接入Nacos）、多种序列化算法、多种负载均衡算法，使用 Java 原生 Socket 于 Natty 实现了两套网络传输模块。
@@ -269,8 +270,20 @@ namingServer.port=Nacos服务器端口
 
 1. 扫描当前包下所有Class类。
 2. 遍历查找含有@Service注解的类对象。
-3. 检查@Service的name属性是否为空
-  - 不为空则使用name的值作为
+3. 检查@Service的name属性是否为空。
+  - 不为空则使用指定的name值作为所实现接口进行发布。
+  - 为空则通过反射获取该类所实现的接口，进行发布。
+
+### 单例工程
+
+通过双重检查锁实现单例模式的创建，单例工厂类通过Map维护所有已创建的单例对象。
+
+支持三种方式的创建：
+
+- 无参构造
+  - 
+- 有参构造
+- 工厂方法
 
 ## LICENSE
 
