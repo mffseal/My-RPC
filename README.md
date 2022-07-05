@@ -281,9 +281,11 @@ namingServer.port=Nacos服务器端口
 支持三种方式的创建：
 
 - 无参构造
-  - 
+  - 通过 `clazz.newInstance()` 实现。
 - 有参构造
+  - 通过 `clazz.getDeclaredConstructor(paramTypes)` 获取有参构造器。
 - 工厂方法
+  - 通过 `Factory.getMethod(methodName, paramTypes)` 获取工厂方法再 invoke。
 
 ## LICENSE
 
